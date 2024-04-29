@@ -1,0 +1,49 @@
+
+<% include header.ejs%>
+
+<div class="title-container">
+    <div class="main-title"><%= title %></div>
+</div>
+
+<br>
+<br>
+<br>
+<div class="title-container">
+    <div class="subtitle">Vous êtes dans le stand : "<%=nomStand%>".</div>
+</div>
+<div class="image-container" >
+    <a href="vente-stock?stand=<%= id %>">
+        <img src="/images/benevoleCredit.webp" alt="Image 1">
+    </a>
+    <a href="vente-articles?stand=<%= id %>">
+        <img src="/images/benevoleVente.webp" alt="Image 2">
+    </a>
+</div>
+<p class="attributs">Stock<span class="testespace"></span> Commande</p>
+<br><br><br><br>
+
+
+<br>
+<br>
+<br>
+<div class="retour-boutton">
+    <a href="/vente"><button class="submit-button">Retour aux stands</button></a>
+</div>
+
+<script>
+    // Fonction pour récupérer les paramètres de l'URL
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    // Récupérer le numéro du stand de l'URL
+    var standNumber = getUrlParameter('stand');
+    document.getElementById('standNumber').innerText = standNumber;
+</script>&ndash;&gt;
+
+</body>
+</html>
+

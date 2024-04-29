@@ -1,0 +1,192 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  color: black;
+}
+
+.navigation {
+  background-color: black;
+  color: white;
+  padding: 15px;
+  text-align: center;
+  font-size: 24px;
+  border-bottom: 2px solid #555;
+  align-items: center;
+  display: flex;
+}
+.title-container {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.main-title {
+  font-weight: bold;
+  text-decoration: underline;
+  font-size: 36px;
+  color: black;
+}
+
+.subtitle {
+  margin-top: 15px;
+  font-size: 28px;
+  color: black;
+}
+
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.image-container a {
+  background-color: white;
+  padding: 20px;
+  border-radius: 20px;
+  margin: 0 10px;
+}
+
+.image-container img {
+  width: 400px;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.navigation a {
+  color: white;
+  margin: 0 2px;
+  text-decoration: none;
+  flex: 1;
+}
+
+.navigation a:hover {
+  color: gray;
+}
+
+.navigation img {
+  margin-right: auto;
+}
+
+.attributs{
+  text-align: center;
+  font-size: 28px;
+  color: black;
+  margin-left: -9px;
+}
+.testespace{
+  margin-right: 380px;
+}
+
+.input-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+
+}
+
+.retour-boutton {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  justify-content: flex-start;
+  margin-left: 20px;
+}
+
+.input-box {
+  width: 200px;
+  height: 50px;
+  border: 2px solid black;
+  border-radius: 10px;
+  margin: 0 10px;
+  padding: 10px;
+  font-size: 16px;
+  color: #888;
+  align-items: center;
+}
+
+.input-box:focus {
+  color: black;
+}
+.validation{
+  margin-top: 15px;
+  font-size: 22px;
+  color: black;
+  font-weight: bold;
+}
+
+.submit-button {
+  background-color: transparent;
+  color: black;
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 204px;
+  background-image: url('/images/dark_check.png');
+}
+.submit-button:hover {
+  background-color: black;
+  color: white;
+}
+.stands-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+.stand {
+  width: calc(25% - 40px);
+  margin-bottom: 20px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.stand img {
+  border-radius: 15px;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+.stand-name {
+  display: block;
+  font-size: 16px;
+}
+
+.stand img {
+  border-radius: 15px;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 10px;
+}
+
+.product-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.product-container th, .product-container td {
+  border: 2px solid #dddddd;
+  text-align: left;
+  padding: 12px;
+  font-size: 18px;
+}
+
+.product-container th {
+  background-color: #f2f2f2;
+}
+
+.product-container td button {
+  margin: 0 10px;
+  padding: 8px 12px;
+  font-size: 18px; /
+}
