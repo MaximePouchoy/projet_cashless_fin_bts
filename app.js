@@ -42,6 +42,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+app.use(cookieParser());
 const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
@@ -50,4 +52,5 @@ const connection = mysql.createConnection({
   password: '',
   database: 'cashless'
 });
+
 module.exports = app;

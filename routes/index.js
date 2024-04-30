@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
 router.use(express.json());
 router.use(session({
   secret: 'votre_secret_key',
-  resave: false,
+  resave: true,
   saveUninitialized: true
 }));
 
@@ -22,16 +22,21 @@ let tagIDGlobal = '';
 let soldeCarte ='';
 let nomUtilisateur = '';
 
+
+
+
+// Utiliser cookie-parser middleware
+
 router.post('/api/data', (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
   const tagID = req.body.TAG_ID;
   const userId = req.body.USER_ID;
-  const username = req.session.username
   // Vérifier si le USER_ID de la requête JSON correspond au nom d'utilisateur de la session
-  if (userId === username) {
+  if (userId == req.cookies.monCookie) {
     // Récupérer le tag ID du JSON reçu
     tagIDGlobal = tagID;
     nomUtilisateur = userId;
+    nomSession = userId;
     console.log('Tag ID reçu :', tagID);
 
     // Effectuer une requête à la base de données pour récupérer les informations de la carte
@@ -102,7 +107,7 @@ router.post('/crediter', (req, res, next) => {
   connection.execute(updateQuery, [montant, numeroTag], (err, results) => {
     if (err) {
       console.error('Erreur lors de la mise à jour du solde :', err);
-      res.status(500).send('Erreur lors de la mise à jour du solde.');      
+      res.status(500).send('Erreur lors de la mise à jour du solde.');
     } else {
       console.log('Solde de la carte mis à jour avec succès.');
       res.render('scancarte', { title: 'Projet CashLess' });
@@ -136,7 +141,7 @@ router.get('/credit', (req, res, next) => {
     console.log(tagIDGlobal);
     res.render('credit', { title: 'Projet CashLess', tagId: tagIDGlobal, nouveauSolde: nouveauSolde });
   } else {
-    res.status(403).send('Accès non autorisé');
+    res.status(403).send('Accès non autorisé 2');
   }
 });
 
@@ -214,6 +219,8 @@ router.post('/createSession', (req, res) => {
   req.session.username = username;
   console.log("session crée");
   console.log(req.session.username)
+  nomUtilisateur = req.session.username;
+  res.cookie('monCookie', req.session.username, { maxAge: 900000, httpOnly: true });
   res.redirect('/scancarte');
 });
 
