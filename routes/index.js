@@ -224,4 +224,106 @@ router.post('/createSession', (req, res) => {
   res.redirect('/scancarte');
 });
 
+router.post('/connectionBenevole', (req, res) => {
+  const { login, mdp } = req.body;
+
+  if (!login || !mdp) {
+    return res.send('<script>alert("veuillez indiquer un mot de passe et un login"); window.location.href = "/";</script>')
+  }
+
+  connection.query('SELECT id_droits FROM benevole WHERE login = ? AND password = ?', [login, mdp], (error, results) => {
+    if (error) {
+      throw error;
+    }
+
+    if (results.length === 0) {
+      return res.send('<script>alert("Identifiants invalides. Veuillez réessayer."); window.location.href = "/";</script>');
+    } else {
+      const id_droit = results[0].id_droits;
+
+      if (id_droit === 2) {
+        res.redirect('/vente');
+      } else if (id_droit === 1) {
+        res.redirect('/credit');
+      } else if (id_droit === 3){
+        res.redirect('/pageAdmin');
+      }
+    }
+  });
+});
+router.get('/pageAdmin', (req, res) => {
+  res.render('pageAdmin', { title: 'page Admin CashLess' });
+});
+
+router.get('/choixStandAdmin', (req, res) => {
+
+  // Exécute une requête SQL pour récupérer le nombre de stands
+  connection.query('SELECT * FROM stand ORDER BY id', (error, results) => {
+    if (error) {
+      throw error;
+    }
+    // Récupère le nombre de stands
+    const nombreDeStands = results[0].nombre_de_stands;
+    // Rend la page "vente" avec le nombre de stands comme variable
+    res.render('choixStandAdmin', { title: 'Projet CashLess', nombreDeStands: results });
+    console.log('Résultats de la requête :', results.length );
+    console.log('Résultats de la requête :'  + results[0].nom);
+  });
+});
+router.get('/ajouterStock', (req, res, next) => {
+  // Exécute une requête SQL pour récupérer les produits avec leur prix et leur stock
+  const query = `
+    SELECT lesproduitsdesstands.id_produit, lesproduitsdesstands.stock, produit.nom, produit.prix 
+    FROM lesproduitsdesstands 
+    JOIN produit ON lesproduitsdesstands.id_produit = produit.id
+    WHERE lesproduitsdesstands.id_stand = ?
+  `;
+  connection.query(query, [req.query.stand], (error, results) => {
+    if (error) {
+      throw error;
+    }
+    // Rend la page "vente-articles" avec les données récupérées
+    res.render('ajouterStock', { title: 'Projet CashLess', produits: results });
+  });
+});
+router.get('/ajouterBenevole', (req, res) => {
+  connection.query('SELECT * FROM stand ORDER BY id', (error, results) => {
+    if (error) {
+      throw error;
+    }
+    // Récupère le nombre de stands
+    const nombreDeStands = results[0].nombre_de_stands;
+    // Rend la page "choixStandAdmin" avec le nombre de stands comme variable
+    res.render('ajouterBenevole', { title: 'page Admin CashLess', nombreDeStands: results });
+    console.log('Résultats de la requête :', results.length );
+    console.log('Résultats de la requête :'  + results[0].nom);
+
+    // Render la page "ajouterBenevole" après avoir obtenu les résultats de la première requête
+
+  });
+});
+
+
+router.post('/CreationBenevole', (req, res) => {
+  const { droit, nom, login, mdp, prenom } = req.body;
+
+  // Utilisation de la requête paramétrée avec des placeholders
+  connection.query('INSERT INTO benevole (id_droits, nom, prenom, login, password) VALUES (?, ?, ?, ?, ?)', [droit, nom, prenom, login, mdp], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de l\'insertion dans la base de données :', error);
+      res.status(500).json({ error: 'Erreur lors de la création du bénévole.' });
+    } else {
+      console.log('Bénévole inséré avec succès !');
+      res.redirect('/pageAdmin'); // Rediriger vers une page de confirmation ou toute autre page nécessaire
+    }
+  });
+});
+
+
 module.exports = router;
+
+
+
+
+
+

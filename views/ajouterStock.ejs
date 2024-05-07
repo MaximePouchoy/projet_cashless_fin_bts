@@ -1,0 +1,60 @@
+<% include header.ejs %>
+
+<div class="title-container">
+    <div class="main-title"><%= title %></div>
+</div>
+
+<br>
+<br>
+<br>
+<div class="product-container">
+    <table>
+        <tr>
+            <th>Nom du Produit</th>
+            <th>Prix</th>
+            <th>Stock</th>
+            <th>Quantité à ajouter</th>
+        </tr>
+        <% produits.forEach(produit => { %>
+            <tr>
+                <td><%= produit.nom %></td>
+                <td><%= produit.prix %> €</td>
+                <td><%= produit.stock %></td>
+                <td>
+                    <!-- Boutons pour augmenter ou diminuer la quantité -->
+                    <button onclick="decrementQuantity(<%= produit.id_produit %>)">-</button>
+                    <span id="quantity_<%= produit.id_produit %>">0</span>
+                    <button onclick="incrementQuantity(<%= produit.id_produit %>)">+</button>
+                </td>
+            </tr>
+        <% }); %>
+    </table>
+</div>
+
+<br>
+<br>
+<br>
+<div class="retour-boutton">
+    <a href="/vente"><button class="submit-button">Retour aux stands</button></a>
+</div>
+
+<script>
+    // Fonction pour incrémenter la quantité
+    function incrementQuantity(productId) {
+        var quantityElement = document.getElementById('quantity_' + productId);
+        var currentQuantity = parseInt(quantityElement.innerText);
+        quantityElement.innerText = currentQuantity + 1;
+    }
+
+    // Fonction pour décrémenter la quantité
+    function decrementQuantity(productId) {
+        var quantityElement = document.getElementById('quantity_' + productId);
+        var currentQuantity = parseInt(quantityElement.innerText);
+        if (currentQuantity > 0) {
+            quantityElement.innerText = currentQuantity - 1;
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -1,24 +1,70 @@
 <% include header.ejs%>
+<form  method="post" action="connectionBenevole">
+  <div class="title-container">
+    <div class="main-title">Projet CashLess</div>
+    <div class="subtitle">Veuillez vous connecter. </div>
+  </div>
 
-<div class="title-container">
-  <div class="main-title">Projet CashLess</div>
-  <div class="subtitle">Quel bénévole êtes-vous ?</div>
-</div>
 
-<div class="image-container" >
-  <a href="identification">
-    <img src="/images/benevoleCredit.webp" alt="Image 1">
-  </a>
-  <a href="vente">
-    <img src="/images/benevoleVente.webp" alt="Image 2">
-  </a>
-</div>
+  <div class="title-container">
+    <div class="subtitle">Entrez votre Login</div>
+  </div>
+  <div class="input-container">
+    <input type="text"  class="input-box" id="login" name="login">
+  </div>
+  <div class="title-container">
+  <span id="login-error" class="error-message"></span><br>
+  </div>
+  <div class="title-container">
+    <div class="subtitle">Entrez votre mot de passe</div>
+  </div>
+  <div class="input-container">
+    <input type="password"  class="input-box" id="mdp" name="mdp">
+  </div>
+  <div class="title-container">
+  <span id="mdp-error" class="error-message"></span><br>
+  </div>
+  <div class="retour-boutton">
+    <button class="submit-button">Se connecter</button>
+  </div>
+</form>
 
-<p class="attributs">Créditeur<span class="testespace"></span> Vendeur</p>
 <br><br><br><br>
 </body>
 <script>
 
+  document.querySelector('form').addEventListener('submit', function(event) {
+    const loginInput = document.getElementById('login');
+    const mdpInput = document.getElementById('mdp');
+    let valid = true;
+
+    // Validation du champ de saisie du login
+    if (!loginInput.value) {
+      valid = false;
+      loginInput.classList.add('error-input');
+      document.getElementById('login-error').textContent = 'Veuillez entrer un login.';
+      document.getElementById('login-error').style.color = '#ff0000'; // Couleur rouge
+    } else {
+      loginInput.classList.remove('error-input');
+      document.getElementById('login-error').textContent = '';
+    }
+
+    // Validation du champ de saisie du mot de passe
+    if (!mdpInput.value) {
+      valid = false;
+      mdpInput.classList.add('error-input');
+      document.getElementById('mdp-error').textContent = 'Veuillez entrer un mot de passe.';
+      document.getElementById('mdp-error').style.color = '#ff0000'; // Couleur rouge
+    } else {
+      mdpInput.classList.remove('error-input');
+      document.getElementById('mdp-error').textContent = '';
+    }
+
+    // Si l'une des validations échoue, on empêche la soumission du formulaire
+    if (!valid) {
+      event.preventDefault();
+    }
+  });
 
 </script>
 

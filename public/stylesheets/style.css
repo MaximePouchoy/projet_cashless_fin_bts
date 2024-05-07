@@ -190,3 +190,7 @@ body {
   padding: 8px 12px;
   font-size: 18px; /
 }
+
+.error-input {
+  border-color: red;
+}

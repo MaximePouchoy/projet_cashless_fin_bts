@@ -1,0 +1,138 @@
+<% include header.ejs%>
+<form method="post" action="creationBenevole">
+    <div class="title-container">
+        <div class="main-title">Projet CashLess</div>
+        <div class="subtitle"> Création du compte </div>
+    </div>
+
+
+    <div class="title-container">
+        <div class="subtitle">Entrez un nom</div>
+    </div>
+    <div class="input-container">
+        <input type="text" class="input-box" id="nom" name="nom">
+    </div>
+    <div class="title-container">
+        <span id="nom-error" class="error-message"></span><br>
+    </div>
+
+    <div class="title-container">
+        <div class="subtitle">Entrez un prénom</div>
+    </div>
+    <div class="input-container">
+        <input type="text" class="input-box" id="prenom" name="prenom">
+    </div>
+    <div class="title-container">
+        <span id="prenom-error" class="error-message"></span><br>
+    </div>
+
+    <div class="title-container">
+        <div class="subtitle">Entrez un Login</div>
+    </div>
+    <div class="input-container">
+        <input type="text" class="input-box" id="login" name="login">
+    </div>
+    <div class="title-container">
+        <span id="login-error" class="error-message"></span><br>
+    </div>
+
+    <div class="title-container">
+        <div class="subtitle">Entrez un mot de passe</div>
+    </div>
+    <div class="input-container">
+        <input type="password" class="input-box" id="mdp" name="mdp">
+    </div>
+    <div class="title-container">
+        <span id="mdp-error" class="error-message"></span><br>
+    </div>
+
+    <div class="title-container">
+        <div class="subtitle">Entrez un droit</div>
+    </div>
+    <div class="input-container">
+        <input type="password" class="input-box" id="droit" name="droit">
+    </div>
+    <div class="title-container">
+        <span id="droit-error" class="error-message"></span><br>
+    </div>
+
+    <div class="retour-boutton">
+        <button class="submit-button">Créer le compte</button>
+    </div>
+
+</form>
+
+<br><br><br><br>
+</body>
+<script>
+    document.querySelector('form').addEventListener('submit', function(event) {
+        const loginInput = document.getElementById('login');
+        const mdpInput = document.getElementById('mdp');
+        const prenomInput = document.getElementById('prenom');
+        const nomInput = document.getElementById('nom');
+        const droitInput = document.getElementById('droit');
+        let valid = true;
+
+        // Validation du champ de saisie du login
+        if (!loginInput.value) {
+            valid = false;
+            loginInput.classList.add('error-input');
+            document.getElementById('login-error').textContent = 'Veuillez entrer un login.';
+            document.getElementById('login-error').style.color = '#ff0000'; // Couleur rouge
+        } else {
+            loginInput.classList.remove('error-input');
+            document.getElementById('login-error').textContent = '';
+        }
+
+        // Validation du champ de saisie du mot de passe
+        if (!mdpInput.value) {
+            valid = false;
+            mdpInput.classList.add('error-input');
+            document.getElementById('mdp-error').textContent = 'Veuillez entrer un mot de passe.';
+            document.getElementById('mdp-error').style.color = '#ff0000'; // Couleur rouge
+        } else {
+            mdpInput.classList.remove('error-input');
+            document.getElementById('mdp-error').textContent = '';
+        }
+
+        // Validation du champ de saisie du prénom
+        if (!prenomInput.value) {
+            valid = false;
+            prenomInput.classList.add('error-input');
+            document.getElementById('prenom-error').textContent = 'Veuillez entrer un prénom.';
+            document.getElementById('prenom-error').style.color = '#ff0000'; // Couleur rouge
+        } else {
+            prenomInput.classList.remove('error-input');
+            document.getElementById('prenom-error').textContent = '';
+        }
+
+        // Validation du champ de saisie du nom
+        if (!nomInput.value) {
+            valid = false;
+            nomInput.classList.add('error-input');
+            document.getElementById('nom-error').textContent = 'Veuillez entrer un nom.';
+            document.getElementById('nom-error').style.color = '#ff0000'; // Couleur rouge
+        } else {
+            nomInput.classList.remove('error-input');
+            document.getElementById('nom-error').textContent = '';
+        }
+
+        // Validation du champ de saisie des droits
+        if (!droitInput.value) {
+            valid = false;
+            droitInput.classList.add('error-input');
+            document.getElementById('droit-error').textContent = 'Veuillez indiquer les droits.';
+            document.getElementById('droit-error').style.color = '#ff0000'; // Couleur rouge
+        } else {
+            droitInput.classList.remove('error-input');
+            document.getElementById('droit-error').textContent = '';
+        }
+
+        // Si l'une des validations échoue, on empêche la soumission du formulaire
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
+</script>
+
+</html>
