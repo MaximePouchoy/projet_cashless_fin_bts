@@ -8,17 +8,25 @@
 <br>
 
 <div class="input-container">
-    <span class="validation" style="font-size: 40px;">Scannez la carte puis cliquez sur ce bouton.</span>
+    <span class="validation" style="font-size: 40px;">Scannez la carte puis attendez la réponse sur le telephone.</span>
 </div>
 <br>
 <br>
 <br>
-<div class="input-container">
-    <a href="/credit" ><button class="submit-button" style="height: 80px;">Accéder à la page de crédit</button></a>
-</div>
-
 <div class="retour-boutton">
     <a href="/"><button class="submit-button">Retour au menu</button></a>
 </div>
+<script>
+    // Récupérer les paramètres de requête de l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const result = urlParams.get('result');
+    const message = urlParams.get('message');
 
+    // Afficher un pop-up en fonction du résultat
+    if (result === 'success') {
+        alert(message);
+    } else if (result === 'error') {
+        alert('Erreur : ' + message);
+    }
+</script>
 </html>

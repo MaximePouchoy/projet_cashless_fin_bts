@@ -23,65 +23,51 @@ let soldeCarte ='';
 let nomUtilisateur = '';
 
 
-
-
-// Utiliser cookie-parser middleware
-
 router.post('/api/data', (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
-  const tagID = req.body.TAG_ID;
-  const userId = req.body.USER_ID;
-  // Vérifier si le USER_ID de la requête JSON correspond au nom d'utilisateur de la session
-  if (userId == req.cookies.monCookie) {
-    // Récupérer le tag ID du JSON reçu
-    tagIDGlobal = tagID;
-    nomUtilisateur = userId;
-    nomSession = userId;
-    console.log('Tag ID reçu :', tagID);
 
-    // Effectuer une requête à la base de données pour récupérer les informations de la carte
-    const query = `SELECT solde FROM carte WHERE tag = ?`;
-    connection.query(query, [tagID], (error, results, fields) => {
-      if (error) {
-        console.error('Erreur lors de la requête à la base de données :', error);
-        res.status(500).json({ error: 'Erreur lors de la récupération des informations de la carte.' });
+  const login = req.body.LOGIN;
+  const motDePasse = req.body.PASSWORD;
+  const tagCarte = req.body.TAG;
+  const soldeCarte = req.body.SOLDE;
+
+  const query = `SELECT * FROM benevole WHERE login = ? AND password = ?`;
+  connection.query(query, [login, motDePasse], (error, results, fields) => {
+    if (error) {
+      console.error('Erreur lors de la requête à la base de données :', error);
+      res.status(500).json({ error: 'Erreur lors de la récupération des informations de la carte.' });
+    } else {
+      if (results.length > 0) {
+        const updateQuery = 'UPDATE carte SET solde = solde + ? WHERE tag = ?';
+        connection.execute(updateQuery, [soldeCarte, tagCarte], (err, updateResults) => {
+          if (err) {
+            console.error('Erreur lors de la mise à jour du solde :', err);
+            res.status(500).send('Erreur lors de la mise à jour du solde.');
+          } else {
+            console.log('Solde de la carte mis à jour avec succès.');
+            // Récupérer le nouveau solde de la carte après la mise à jour
+            const newQuery = `SELECT solde FROM carte WHERE tag = ?`;
+            connection.query(newQuery, [tagCarte], (error, newResults, fields) => {
+              if (error) {
+                console.error('Erreur lors de la récupération du nouveau solde :', error);
+                res.status(500).json({ error: 'Erreur lors de la récupération du nouveau solde.' });
+              } else {
+                const newSoldeCarte = newResults[0].solde;
+                // Renvoyer un JSON avec la confirmation et le nouveau solde de la carte
+                res.json({ Resultat: "Solde mis à jour", Carte: tagCarte, NouveauSolde: newSoldeCarte });
+              }
+            });
+          }
+        });
       } else {
-        if (results.length > 0) {
-          // Récupérer les informations de la carte
-          const numero = tagID;
-          const solde = results[0].solde;
-          soldeCarte = results[0].solde;
-          console.log('Informations de la carte :\nNumero de carte : ', numero, '\nSolde de la carte : ', solde, 'euro');
-          // Renvoyer un JSON avec les informations de la carte
-          res.json({ numeroCarte: numero, soldeCarte: solde });
-        } else {
-          // Aucune carte trouvée avec ce numéro
-          res.status(404).json({ error: 'Aucune carte trouvée avec ce numéro.' });
-        }
+        // Aucune carte trouvée avec ces identifiants
+        res.status(404).json({ error: 'Les identifiants sont mauvais, veuillez recommencer' });
       }
-    });
-  } else {
-    // Si le USER_ID ne correspond pas au nom d'utilisateur de la session, renvoyer une erreur
-    res.status(403).json({ error: 'Accès non autorisé.' });
-  }
+    }
+  });
 });
 
 
-
-
-// // Route pour gérer les requêtes POST pour le crédit
-// router.post('/credit', (req, res) => {
-//   // Logique pour traiter les données JSON reçues
-//   const jsonData = req.body;
-//   console.log(jsonData);
-//
-//   // Renvoie le numéro de carte reçu en réponse
-//   res.send(jsonData.numeroCarte);
-//
-//   // Mettre à jour le champ "Numéro de carte"
-//
-//   updateCardNumber(jsonData)
-// });
 
 // Route pour afficher la page d'accueil
 router.get('/', (req, res, next) => {
@@ -133,16 +119,9 @@ router.get('/vente', (req, res, next) => {
 
 // Route pour afficher la page de crédit
 router.get('/credit', (req, res, next) => {
-  const userId = req.session.username;
 
-  const nouveauSolde = soldeCarte; // Récupérez le solde de la carte de la base de données ou d'où vous le stockez
+  res.render('credit', { title: 'Projet CashLess'});
 
-  if (userId === nomUtilisateur) {
-    console.log(tagIDGlobal);
-    res.render('credit', { title: 'Projet CashLess', tagId: tagIDGlobal, nouveauSolde: nouveauSolde });
-  } else {
-    res.status(403).send('Accès non autorisé 2');
-  }
 });
 
 router.get('/vente-articles', (req, res, next) => {
@@ -199,13 +178,7 @@ router.get('/choixvente', (req, res, next) => {
   });
 });
 router.get('/scancarte', (req, res) => {
-  console.log("Scancarte <- ");
-  tagIDGlobal = null;
-  soldeCarte = null;
-  const username = req.session.username;
-  console.log("Scancarte : " + username)
-  res.render('scancarte', { title: 'Projet CashLess', username: username });
-
+  res.render('scancarte', { title: 'Projet CashLess' });
 });
 
 
@@ -244,7 +217,7 @@ router.post('/connectionBenevole', (req, res) => {
       if (id_droit === 2) {
         res.redirect('/vente');
       } else if (id_droit === 1) {
-        res.redirect('/credit');
+        res.redirect('/scancarte');
       } else if (id_droit === 3){
         res.redirect('/pageAdmin');
       }
@@ -314,11 +287,63 @@ router.post('/CreationBenevole', (req, res) => {
       res.status(500).json({ error: 'Erreur lors de la création du bénévole.' });
     } else {
       console.log('Bénévole inséré avec succès !');
-      res.redirect('/pageAdmin'); // Rediriger vers une page de confirmation ou toute autre page nécessaire
+      // Ajout du code JavaScript pour afficher une alerte de confirmation
+      res.send('<script>alert("Bénévole ajouté avec succès !"); window.location.href = "/pageAdmin";</script>');
     }
   });
 });
 
+router.get('/ajouterProduit', (req, res) => {
+  res.render('ajouterProduit', { title: 'Ajouter un produit' });
+});
+
+router.post('/creerProduit', (req, res) => {
+  const { nom, prix } = req.body;
+  const query = 'INSERT INTO produit (nom, prix) VALUES (?, ?)';
+  connection.query(query, [nom, prix], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de l\'insertion dans la base de données :', error);
+      res.status(500).json({ error: 'Erreur lors de la création du produit.' });
+    } else {
+      console.log('Produit inséré avec succès !');
+      res.redirect('/pageAdmin');
+    }
+  });
+});
+
+router.get('/ajouterStand', (req, res) => {
+  connection.query('SELECT * FROM produit', (error, produits) => {
+    if (error) {
+      console.error('Erreur lors de la récupération des produits :', error);
+      produits = [];
+    }
+    res.render('ajouterStand', { title: 'Ajouter un stand', produits });
+  });
+});
+
+router.post('/creerStand', (req, res) => {
+  const { nom, produits } = req.body;
+  connection.query('INSERT INTO stand (nom) VALUES (?)', [nom], (error, result) => {
+    if (error) {
+      console.error('Erreur lors de l\'insertion du stand :', error);
+      res.status(500).json({ error: 'Erreur lors de la création du stand.' });
+    } else {
+      const idStand = result.insertId;
+      for (const produit of produits) {
+        const stock = req.body[`stock_${produit}`]; // Récupérer le stock initial du produit
+        connection.query('INSERT INTO lesproduitsdesstands (id_stand, id_produit, stock) VALUES (?, ?, ?)', [idStand, produit, stock], (err, result) => {
+          if (err) {
+            console.error('Erreur lors de l\'insertion du produit associé au stand :', err);
+            res.status(500).json({ error: 'Erreur lors de la création du stand et des produits associés.' });
+            return; // Arrête l'exécution en cas d'erreur
+          }
+        });
+      }
+      console.log('Stand et produits associés insérés avec succès !');
+      res.redirect('/pageAdmin');
+    }
+  });
+});
 
 module.exports = router;
 

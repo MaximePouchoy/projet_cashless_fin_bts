@@ -45,12 +45,28 @@
     <div class="title-container">
         <span id="mdp-error" class="error-message"></span><br>
     </div>
+    <div class="title-container">
+        <div class="subtitle">Confirmez le mot de passe</div>
+    </div>
+    <div class="input-container">
+        <input type="password" class="input-box" id="mdpConfirm" name="mdpConfirm">
+    </div>
+    <div class="title-container">
+        <span id="mdpConfirm-error" class="error-message"></span><br>
+    </div>
+
+
 
     <div class="title-container">
         <div class="subtitle">Entrez un droit</div>
     </div>
+
     <div class="input-container">
-        <input type="password" class="input-box" id="droit" name="droit">
+        <select class="input-box" id="droit" name="droit">
+            <option value="1">Créditeur</option>
+            <option value="2">Vendeur</option>
+            <option value="3">Administrateur</option>
+        </select>
     </div>
     <div class="title-container">
         <span id="droit-error" class="error-message"></span><br>
@@ -59,7 +75,6 @@
     <div class="retour-boutton">
         <button class="submit-button">Créer le compte</button>
     </div>
-
 </form>
 
 <br><br><br><br>
@@ -68,6 +83,7 @@
     document.querySelector('form').addEventListener('submit', function(event) {
         const loginInput = document.getElementById('login');
         const mdpInput = document.getElementById('mdp');
+        const mdpConfirmInput = document.getElementById('mdpConfirm');
         const prenomInput = document.getElementById('prenom');
         const nomInput = document.getElementById('nom');
         const droitInput = document.getElementById('droit');
@@ -104,6 +120,15 @@
         } else {
             prenomInput.classList.remove('error-input');
             document.getElementById('prenom-error').textContent = '';
+        }
+        if (mdpConfirmInput.value !== mdpInput.value) {
+            valid = false;
+            mdpConfirmInput.classList.add('error-input');
+            document.getElementById('mdpConfirm-error').textContent = 'Les mots de passe ne correspondent pas.';
+            document.getElementById('mdpConfirm-error').style.color = '#ff0000'; // Couleur rouge
+        } else {
+            mdpConfirmInput.classList.remove('error-input');
+            document.getElementById('mdpConfirm-error').textContent = '';
         }
 
         // Validation du champ de saisie du nom

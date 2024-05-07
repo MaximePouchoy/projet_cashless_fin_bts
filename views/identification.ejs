@@ -1,21 +1,17 @@
 <% include header.ejs%>
 
 <!-- identification.ejs -->
-<form  method="post" action="createSession">
-
+<form method="get" action="/createSession">
 
     <div class="title-container">
         <div class="main-title">Identification</div>
         <div class="subtitle">Entrez votre identifiant</div>
     </div>
 
-
-
     <div class="input-container">
-        <input type="text"  class="input-box" id="utilisateur" name="utilisateur">
+        <input type="text" class="input-box" id="utilisateur" name="utilisateur">
     </div>
     <button type="submit">Se connecter</button>
 </form>
-
 
 </html>

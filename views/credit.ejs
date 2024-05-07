@@ -1,71 +1,7 @@
 <% include header.ejs%>
 
-<div class="title-container">
-
-    <div class="main-title"><%=title%></div>
-
-</div>
-
-<br>
-<br>
-<div class="input-container">
-    <span>Scannez la carte (ou entrez le numéro à la main) :</span>
-</div>
-<form method="post" action="crediter">
-
-    <div class="input-container">
-        <input type="text"  class="input-box" id="numeroCarte" name="numeroCarte" placeholder="Numéro de carte" onfocus="clearPlaceholder('numeroCarte')" onblur="restorePlaceholder('numeroCarte')" value="<%=tagId%>">
-    </div>
-
-    <div>
-
-        <div class="input-container">
-            <span>Entrez le montant à Créditer :</span>
-        </div>
-    </div>
-
-    <div class="input-container">
-        <input type="text" class="input-box" id="montantCrediter" name="montantCrediter" placeholder="Montant à créditer" onfocus="clearPlaceholder('montantCrediter')" onblur="restorePlaceholder('montantCrediter')">
-    </div>
-    <div class="input-container">
-        <span class="validation">Valider le crédit ?</span>
-    </div>
-
-    <div class="input-container">
-        <input id="validerButton" type="submit" class="submit-button" value="Valider">
-    </div>
-</form>
-<br>
-<br>
-<br>
-<br>
-<div class="retour-boutton">
-    <a href="scancarte"><button class="submit-button">Scanner La Carte</button></a>
-</div>
 
 <script>
-    function clearPlaceholder(elementId) {
-        document.getElementById(elementId).placeholder = '';
-    }
-
-    function restorePlaceholder(elementId) {
-        var element = document.getElementById(elementId);
-        if (element.value === '') {
-            if (elementId === 'numeroCarte') {
-                element.placeholder = 'Numéro de carte';
-            } else if (elementId === 'montantCrediter') {
-                element.placeholder = 'Montant à Créditer';
-            }
-        }
-    }
-    /* document.getElementById('validerButton').addEventListener('click',
-         function () {
-             var montantCrediter = document.getElementById('montantCrediter').value;
-             console.log('Montant à Créditer :', montantCrediter);
-             var nouveauSolde = parseFloat('<%= nouveauSolde %>') + parseFloat(montantCrediter);
-            console.log('Nouveau solde :', nouveauSolde);
-            res.send("/validerDebit", nouveauSolde)
-        });*/
 </script>
 </body>
 </html>

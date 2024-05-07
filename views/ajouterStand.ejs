@@ -1,0 +1,23 @@
+<% include header.ejs %>
+
+<div class="title-container">
+    <div class="main-title">Ajouter un stand</div>
+</div>
+
+<form action="/creerStand" method="POST">
+    <label for="nom">Nom du stand :</label>
+    <input type="text" id="nom" name="nom" required><br>
+    <% produits.forEach(produit => { %>
+        <input type="checkbox" id="<%= produit.id %>" name="produits" value="<%= produit.id %>">
+        <label for="<%= produit.id %>"><%= produit.nom %></label>
+        <input type="number" name="stock_<%= produit.id %>" placeholder="Stock initial" min="0"><br> <!-- Champ pour le stock initial -->
+    <% }); %>
+    <button type="submit">Créer Stand</button>
+</form>
+
+<script>
+
+
+</script>
+
+</html>
