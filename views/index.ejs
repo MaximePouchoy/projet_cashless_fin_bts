@@ -1,33 +1,26 @@
 <% include header.ejs%>
-<form  method="post" action="connectionBenevole">
-  <div class="title-container">
-    <div class="main-title">Projet CashLess</div>
-    <div class="subtitle">Veuillez vous connecter. </div>
-  </div>
+<div class="title-container">
+  <br>
+  <br>
+  <div class="main-title">Projet CashLess</div>
+  <div class="subtitle">Veuillez vous connecter. </div>
+</div>
+<br>
+<br>
 
 
-  <div class="title-container">
-    <div class="subtitle">Entrez votre Login</div>
-  </div>
-  <div class="input-container">
-    <input type="text"  class="input-box" id="login" name="login">
-  </div>
-  <div class="title-container">
-  <span id="login-error" class="error-message"></span><br>
-  </div>
-  <div class="title-container">
-    <div class="subtitle">Entrez votre mot de passe</div>
-  </div>
-  <div class="input-container">
-    <input type="password"  class="input-box" id="mdp" name="mdp">
-  </div>
-  <div class="title-container">
-  <span id="mdp-error" class="error-message"></span><br>
-  </div>
+<form  method="post" action="connectionBenevole" class="form-container">
+  <label for="nom" class="subtitle_stand">Entrez votre Login :</label>
+  <input type="text" id="login" name="login">
+  <span id="login-error" class="error-message"></span>
+  <label for="nom" class="subtitle_stand">Entrez votre Mot de passe :</label>
+    <input type="password" id="mdp" name="mdp">
+  <span id="mdp-error" class="error-message"></span>
   <div class="retour-boutton">
-    <button class="submit-button">Se connecter</button>
+    <button type="submit">Se connecter</button>
   </div>
 </form>
+
 
 <br><br><br><br>
 </body>

@@ -26,18 +26,8 @@ let nomUtilisateur = '';
 router.post('/api/data', (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
 
-  const login = req.body.LOGIN;
-  const motDePasse = req.body.PASSWORD;
   const tagCarte = req.body.TAG;
-  const soldeCarte = req.body.SOLDE;
-
-  const query = `SELECT * FROM benevole WHERE login = ? AND password = ?`;
-  connection.query(query, [login, motDePasse], (error, results, fields) => {
-    if (error) {
-      console.error('Erreur lors de la requête à la base de données :', error);
-      res.status(500).json({ error: 'Erreur lors de la récupération des informations de la carte.' });
-    } else {
-      if (results.length > 0) {
+  const soldeCarte = req.body.MODIF_SOLDE;
         const updateQuery = 'UPDATE carte SET solde = solde + ? WHERE tag = ?';
         connection.execute(updateQuery, [soldeCarte, tagCarte], (err, updateResults) => {
           if (err) {
@@ -59,15 +49,29 @@ router.post('/api/data', (req, res) => {
             });
           }
         });
+});
+
+router.post('/api/connexion', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+
+  const login = req.body.LOGIN;
+  const motDePasse = req.body.PASSWORD;
+
+  const query = `SELECT * FROM benevole WHERE login = ? AND password = ?`;
+  connection.query(query, [login, motDePasse], (error, results, fields) => {
+    if (error) {
+      console.error('Erreur lors de la requête à la base de données :', error);
+      res.status(500).json({ error: 'Erreur lors de la vérification des identifiants.' });
+    } else {
+      if (results.length > 0) {
+        const droitID = results[0].id_droits;
+        res.json({ authentifie: true, id_droit: droitID });
       } else {
-        // Aucune carte trouvée avec ces identifiants
-        res.status(404).json({ error: 'Les identifiants sont mauvais, veuillez recommencer' });
+        res.json({ authentifie: false });
       }
     }
   });
 });
-
-
 
 // Route pour afficher la page d'accueil
 router.get('/', (req, res, next) => {
@@ -245,18 +249,25 @@ router.get('/choixStandAdmin', (req, res) => {
 });
 router.get('/ajouterStock', (req, res, next) => {
   // Exécute une requête SQL pour récupérer les produits avec leur prix et leur stock
-  const query = `
-    SELECT lesproduitsdesstands.id_produit, lesproduitsdesstands.stock, produit.nom, produit.prix 
-    FROM lesproduitsdesstands 
-    JOIN produit ON lesproduitsdesstands.id_produit = produit.id
+  const query1 = `
+    SELECT lesproduitsdesstands.id_produit, lesproduitsdesstands.stock, produit.nom, produit.prix
+    FROM lesproduitsdesstands
+           JOIN produit ON lesproduitsdesstands.id_produit = produit.id
     WHERE lesproduitsdesstands.id_stand = ?
   `;
-  connection.query(query, [req.query.stand], (error, results) => {
+  connection.query(query1, [req.query.stand], (error, results) => {
     if (error) {
       throw error;
     }
-    // Rend la page "vente-articles" avec les données récupérées
-    res.render('ajouterStock', { title: 'Projet CashLess', produits: results });
+    // Ensuite, exécutez la deuxième requête SQL pour récupérer tous les noms de produits
+    const query2 = `SELECT id, nom FROM produit`;
+    connection.query(query2, (error, produits_global) => {
+      if (error) {
+        throw error;
+      }
+      // Rend la page "ajouterStock" avec les données récupérées
+      res.render('ajouterStock', { title: 'Projet CashLess', produits: results, produits_global: produits_global });
+    });
   });
 });
 router.get('/ajouterBenevole', (req, res) => {
@@ -306,7 +317,7 @@ router.post('/creerProduit', (req, res) => {
       res.status(500).json({ error: 'Erreur lors de la création du produit.' });
     } else {
       console.log('Produit inséré avec succès !');
-      res.redirect('/pageAdmin');
+      res.send('<script>alert("Produit ajouté avec succès !"); window.location.href = "/pageAdmin";</script>');
     }
   });
 });
@@ -340,7 +351,8 @@ router.post('/creerStand', (req, res) => {
         });
       }
       console.log('Stand et produits associés insérés avec succès !');
-      res.redirect('/pageAdmin');
+      res.send('<script>alert(" Stand et produits associés insérés avec succès !"); window.location.href = "/pageAdmin";</script>');
+
     }
   });
 });

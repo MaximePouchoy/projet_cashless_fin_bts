@@ -16,6 +16,31 @@ body {
   align-items: center;
   display: flex;
 }
+
+
+
+.navigation ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navigation ul li {
+  display: inline;
+  margin-right: 20px;
+  margin: 0 10px; /* Ajout de marge horizontale */
+}
+
+.navigation ul li a {
+  text-decoration: none;
+  color: #fff; /* Couleur des liens */
+  font-weight: bold;
+}
+
+.navigation ul li a:hover {
+  color: #ffd700; /* Couleur au survol */
+}
+
 .title-container {
   text-align: center;
   margin-top: 30px;
@@ -102,9 +127,18 @@ body {
   margin-top: 20px;
   display: flex;
   justify-content: center;
-  justify-content: flex-start;
-  margin-left: 20px;
 }
+
+.retour-boutton button {
+  background-color: black;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
 
 .input-box {
   width: 200px;
@@ -203,3 +237,158 @@ body {
 .error-input {
   border-color: red;
 }
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
+
+
+.navigation ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.navigation ul li {
+  margin-right: 20px;
+}
+
+.navigation ul li:last-child {
+  margin-right: 0;
+}
+
+.navigation a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.title-container {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.main-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.form-container {
+  background-color: #fff;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border: 2px solid #000; /* Ajout de la bordure noire */
+}
+
+.form-container label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: black;
+
+}
+
+.form-container input[type="text"],
+.form-container input[type="number"],
+.form-container input[type="password"],
+.form-container select option,
+.form-container select
+{
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+  background-color: #fff;
+  border: 2px solid #000; /* Ajout de la bordure noire */
+}
+
+
+.form-container button[type="submit"] {
+  background-color: black;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.form-container button[type="submit"]:hover {
+  background-color: #555;
+}
+
+.error-message {
+  color: #ff0000;
+  font-size: 14px;
+  margin-top: 5px;
+}
+.subtitle_stand{
+  text-decoration: underline;
+  font-weight: bold;
+}
+input[type="checkbox"] {
+  display: none; /* Masquer la case à cocher par défaut */
+}
+
+input[type="checkbox"] + label::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #000; /* Couleur de la bordure noire */
+  margin-right: 8px;
+  vertical-align: middle;
+  border-radius: 4px; /* Pour arrondir un peu les bords des checkbox */
+  border-color: black;
+}
+
+/* Style des labels des cases à cocher lorsqu'elles sont cochées */
+input[type="checkbox"]:checked + label::before {
+  content: "\2714"; /* Code Unicode du symbole du V */
+  color: white;
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  font-size: 12px; /* Taille de la police pour ajuster la taille du V */
+  line-height: 13px;
+  text-align: center;
+  border: 2px solid #000; /* Couleur de la bordure noire */
+  margin-right: 8px;
+  vertical-align: middle;
+  background-color: black;
+}
+input[type="number"]:disabled {
+
+  border: 2px solid #000;
+
+}
+input[type="number"]:enabled {
+  border: 2px solid #000;
+}
+
+input[type="text"]:disabled {
+
+  border: 2px solid #000;
+
+}
+input[type="text"]:enabled {
+  border: 2px solid #000;
+}
+
+input[type="password"]:disabled {
+
+  border: 2px solid #000;
+
+}
+input[type="password"]:enabled {
+  border: 2px solid #000;
+}
+

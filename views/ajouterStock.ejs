@@ -1,42 +1,76 @@
 <% include header.ejs %>
 
-<div class="title-container">
-    <div class="main-title"><%= title %></div>
-</div>
+<form action="/creerProduit" method="POST" class="form-container">
+    <div class="title-container">
+        <div class="main-title"><%= title %></div>
+    </div>
 
-<br>
-<br>
-<br>
-<div class="product-container">
-    <table>
-        <tr>
-            <th>Nom du Produit</th>
-            <th>Prix</th>
-            <th>Stock</th>
-            <th>Quantité à ajouter</th>
-        </tr>
-        <% produits.forEach(produit => { %>
+    <br>
+    <br>
+    <br>
+
+    <div class="product-container">
+        <table>
+            <tr>
+                <th>Nom du Produit</th>
+                <th>Prix</th>
+                <th>Stock</th>
+                <th>Quantité à ajouter</th>
+            </tr>
+            <% produits.forEach(produit => { %>
+                <tr>
+                    <td><%= produit.nom %></td>
+                    <td><%= produit.prix %> €</td>
+                    <td><%= produit.stock %></td>
+                    <td>
+                        <!-- Boutons pour augmenter ou diminuer la quantité -->
+                        <button onclick="decrementQuantity(<%= produit.id_produit %>)">-</button>
+                        <span id="quantity_<%= produit.id_produit %>">0</span>
+                        <button onclick="incrementQuantity(<%= produit.id_produit %>)">+</button>
+                    </td>
+                </tr>
+            <% }); %>
+        </table>
+    </div>
+
+    <br>
+    <br>
+    <br>
+
+    <div class="product-container">
+        <h2>Produits Globaux</h2>
+        <table>
+            <tr>
+                <th>Nom du Produit</th>
+                <th>Quantité à ajouter</th>
+            </tr>
+            <% produits_global.forEach(produit => {
+                // Vérifier si le produit est déjà présent dans la liste des produits du stand
+                const isPresentInStand = produits.find(prod => prod.id_produit === produit.id);
+            if (!isPresentInStand) { // Exclure les produits déjà présents dans le stand
+            %>
             <tr>
                 <td><%= produit.nom %></td>
-                <td><%= produit.prix %> €</td>
-                <td><%= produit.stock %></td>
                 <td>
                     <!-- Boutons pour augmenter ou diminuer la quantité -->
-                    <button onclick="decrementQuantity(<%= produit.id_produit %>)">-</button>
-                    <span id="quantity_<%= produit.id_produit %>">0</span>
-                    <button onclick="incrementQuantity(<%= produit.id_produit %>)">+</button>
+                    <button onclick="decrementQuantity(<%= produit.id %>)">-</button>
+                    <span id="quantity_<%= produit.id %>">0</span>
+                    <button onclick="incrementQuantity(<%= produit.id %>)">+</button>
                 </td>
             </tr>
-        <% }); %>
-    </table>
-</div>
+            <% }
+            }); %>
+        </table>
+    </div>
 
-<br>
-<br>
-<br>
-<div class="retour-boutton">
-    <a href="/vente"><button class="submit-button">Retour aux stands</button></a>
-</div>
+    <br>
+    <br>
+    <br>
+    <div class="retour-boutton">
+        <a href="/vente"><button class="submit-button">Retour aux stands</button></a>
+    </div>
+
+</form>
 
 <script>
     // Fonction pour incrémenter la quantité

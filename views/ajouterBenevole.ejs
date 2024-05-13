@@ -1,77 +1,50 @@
 <% include header.ejs%>
-<form method="post" action="creationBenevole">
-    <div class="title-container">
-        <div class="main-title">Projet CashLess</div>
-        <div class="subtitle"> Création du compte </div>
-    </div>
 
-
-    <div class="title-container">
-        <div class="subtitle">Entrez un nom</div>
-    </div>
-    <div class="input-container">
+<div class="title-container">
+<div class="main-title">Projet CashLess</div>
+<div class="subtitle"> Création du compte </div>
+</div>
+<br>
+<br>
+<form method="post" action="/creationBenevole" class="form-container">
+        <label class="subtitle_stand">Entrez un nom</label>
         <input type="text" class="input-box" id="nom" name="nom">
-    </div>
-    <div class="title-container">
         <span id="nom-error" class="error-message"></span><br>
-    </div>
-
-    <div class="title-container">
-        <div class="subtitle">Entrez un prénom</div>
-    </div>
-    <div class="input-container">
+        <label class="subtitle_stand">Entrez un prénom</label>
         <input type="text" class="input-box" id="prenom" name="prenom">
-    </div>
-    <div class="title-container">
         <span id="prenom-error" class="error-message"></span><br>
-    </div>
-
-    <div class="title-container">
-        <div class="subtitle">Entrez un Login</div>
-    </div>
-    <div class="input-container">
+        <label class="subtitle_stand">Entrez un Login</label>
         <input type="text" class="input-box" id="login" name="login">
-    </div>
-    <div class="title-container">
         <span id="login-error" class="error-message"></span><br>
-    </div>
-
-    <div class="title-container">
-        <div class="subtitle">Entrez un mot de passe</div>
-    </div>
-    <div class="input-container">
+        <label class="subtitle_stand">Entrez un mot de passe</label>
         <input type="password" class="input-box" id="mdp" name="mdp">
-    </div>
-    <div class="title-container">
         <span id="mdp-error" class="error-message"></span><br>
-    </div>
-
-    <div class="title-container">
-        <div class="subtitle">Entrez un droit</div>
-    </div>
-    <div class="input-container">
-        <input type="password" class="input-box" id="droit" name="droit">
-    </div>
-    <div class="title-container">
+        <label class="subtitle_stand">Confirmez le mot de passe</label>
+        <input type="password" class="input-box" id="mdpConfirm" name="mdpConfirm">
+        <span id="mdpConfirm-error" class="error-message"></span><br>
+        <label class="subtitle_stand">Entrez un droit</label>
+        <select class="input-box" id="droit" name="droit">
+            <option value="1">Créditeur</option>
+            <option value="2">Vendeur</option>
+            <option value="3">Admin</option>
+        </select>
         <span id="droit-error" class="error-message"></span><br>
-    </div>
-
-    <div class="retour-boutton">
-        <button class="submit-button">Créer le compte</button>
-    </div>
-
+        <button type="submit">Créer le compte</button>
 </form>
 
 <br><br><br><br>
 </body>
 <script>
-    document.querySelector('form').addEventListener('submit', function(event) {
-        const loginInput = document.getElementById('login');
-        const mdpInput = document.getElementById('mdp');
-        const prenomInput = document.getElementById('prenom');
-        const nomInput = document.getElementById('nom');
-        const droitInput = document.getElementById('droit');
-        let valid = true;
+
+
+        document.querySelector('form').addEventListener('submit', function(event) {
+            const loginInput = document.getElementById('login');
+            const mdpInput = document.getElementById('mdp');
+            const mdpConfirmInput = document.getElementById('mdpConfirm'); // Champ de confirmation du mot de passe
+            const prenomInput = document.getElementById('prenom');
+            const nomInput = document.getElementById('nom');
+            const droitInput = document.getElementById('droit');
+            let valid = true;
 
         // Validation du champ de saisie du login
         if (!loginInput.value) {
@@ -127,7 +100,15 @@
             droitInput.classList.remove('error-input');
             document.getElementById('droit-error').textContent = '';
         }
-
+            if (mdpConfirmInput.value !== mdpInput.value) {
+                valid = false;
+                mdpConfirmInput.classList.add('error-input');
+                document.getElementById('mdpConfirm-error').textContent = 'Les mots de passe ne correspondent pas.';
+                document.getElementById('mdpConfirm-error').style.color = '#ff0000'; // Couleur rouge
+            } else {
+                mdpConfirmInput.classList.remove('error-input');
+                document.getElementById('mdpConfirm-error').textContent = '';
+            }
         // Si l'une des validations échoue, on empêche la soumission du formulaire
         if (!valid) {
             event.preventDefault();
