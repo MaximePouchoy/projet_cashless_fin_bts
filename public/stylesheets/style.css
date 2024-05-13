@@ -177,6 +177,11 @@ body {
   background-color: black;
   color: white;
 }
+
+.stand:hover {
+  background-color: black; /* Couleur de fond inversée */
+  color: white; /* Couleur du texte inversée */
+}
 .stands-container {
   display: flex;
   flex-wrap: wrap;
@@ -185,23 +190,34 @@ body {
 }
 
 .stand {
-  width: calc(25% - 40px);
-  margin-bottom: 20px;
+  border: 2px solid black; /* Bordure noire */
+  border-radius: 6px; /* Coins moins arrondis */
+  margin: 10px;
+  padding: 10px;
   text-align: center;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 150px; /* Ajustez la largeur selon vos besoins */
 }
 
-.stand img {
-  border-radius: 15px;
-  width: 100px;
-  height: 100px;
-  margin-bottom: 10px;
+.stand-image {
+  display: inline-block;
+  width: 100px; /* Largeur de l'image */
+  height: 100px; /* Hauteur de l'image */
+  background-image: url("/images/stand.png"); /* Image de fond */
+  background-size: cover; /* Ajuste la taille de l'image pour couvrir le conteneur */
+  border-radius: 15px; /* Coins arrondis */
+  background-position: center; /* Centre l'image horizontalement */
+  background-repeat: no-repeat; /* Empêche la répétition de l'image */
 }
+
+/* Au survol de la classe stand */
+.stand:hover .stand-image {
+  background-image: url("/images/stand-modified.png"); /* Changement de l'image de fond au survol */
+}
+
 
 .stand-name {
   display: block;
-  font-size: 16px;
+  margin-top: 10px;
 }
 
 .stand img {
@@ -215,6 +231,9 @@ body {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  border-radius: 2px;
+
+
 }
 
 .product-container th, .product-container td {
@@ -222,16 +241,27 @@ body {
   text-align: left;
   padding: 12px;
   font-size: 18px;
+  border-color: black;
+  border-radius: 2px;
 }
 
 .product-container th {
   background-color: #f2f2f2;
+  border-radius: 2px;
+  background-color: black;
+
+
 }
 
 .product-container td button {
   margin: 0 10px;
   padding: 8px 12px;
   font-size: 18px; /
+}
+
+.table-header {
+  background-color: black;
+  color: white;
 }
 
 .error-input {

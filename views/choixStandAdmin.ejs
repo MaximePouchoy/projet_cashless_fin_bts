@@ -1,5 +1,6 @@
 <% include header.ejs%>
 
+
 <div class="title-container">
     <div class="main-title"><%= title %></div>
 </div>
@@ -7,7 +8,7 @@
 <br>
 <br>
 <br>
-<div class="title-container"><div class="subtitle">Selectionnez votre stand</div></div>
+<div class="title-container"><div class="subtitle">Sélectionnez votre stand</div></div>
 
 <br>
 <br>
@@ -15,15 +16,17 @@
 <!-- Affichage des stands -->
 <div class="stands-container">
     <% nombreDeStands.forEach(function(stand, i) { %>
-
-
         <div class="stand" onclick="showStandInfo(<%= i %>)">
-            <a href="/ajouterStock?stand=<%= stand.id %>"><img src="/images/stand.png" alt="Stand <%= i %>"></a>
-            <span class="stand-name"> <%= stand.nom %></span>
+            <a href="/ajouterStock?stand=<%=stand.id%>">
+                <!-- Ajoutez la classe stand-image à cet élément span -->
+                <span class="stand-image"></span>
+            </a>
+            <span class="stand-name"><%= stand.nom %></span>
         </div>
     <% }); %>
-
 </div>
+
+
 <br>
 <br>
 <br>

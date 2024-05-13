@@ -232,44 +232,8 @@ router.get('/pageAdmin', (req, res) => {
   res.render('pageAdmin', { title: 'page Admin CashLess' });
 });
 
-router.get('/choixStandAdmin', (req, res) => {
 
-  // Exécute une requête SQL pour récupérer le nombre de stands
-  connection.query('SELECT * FROM stand ORDER BY id', (error, results) => {
-    if (error) {
-      throw error;
-    }
-    // Récupère le nombre de stands
-    const nombreDeStands = results[0].nombre_de_stands;
-    // Rend la page "vente" avec le nombre de stands comme variable
-    res.render('choixStandAdmin', { title: 'Projet CashLess', nombreDeStands: results });
-    console.log('Résultats de la requête :', results.length );
-    console.log('Résultats de la requête :'  + results[0].nom);
-  });
-});
-router.get('/ajouterStock', (req, res, next) => {
-  // Exécute une requête SQL pour récupérer les produits avec leur prix et leur stock
-  const query1 = `
-    SELECT lesproduitsdesstands.id_produit, lesproduitsdesstands.stock, produit.nom, produit.prix
-    FROM lesproduitsdesstands
-           JOIN produit ON lesproduitsdesstands.id_produit = produit.id
-    WHERE lesproduitsdesstands.id_stand = ?
-  `;
-  connection.query(query1, [req.query.stand], (error, results) => {
-    if (error) {
-      throw error;
-    }
-    // Ensuite, exécutez la deuxième requête SQL pour récupérer tous les noms de produits
-    const query2 = `SELECT id, nom FROM produit`;
-    connection.query(query2, (error, produits_global) => {
-      if (error) {
-        throw error;
-      }
-      // Rend la page "ajouterStock" avec les données récupérées
-      res.render('ajouterStock', { title: 'Projet CashLess', produits: results, produits_global: produits_global });
-    });
-  });
-});
+
 router.get('/ajouterBenevole', (req, res) => {
   connection.query('SELECT * FROM stand ORDER BY id', (error, results) => {
     if (error) {
@@ -356,6 +320,82 @@ router.post('/creerStand', (req, res) => {
     }
   });
 });
+
+
+
+router.get('/choixStandAdmin', (req, res) => {
+  // Exécuter une requête SQL pour récupérer tous les stands
+  connection.query('SELECT * FROM stand ORDER BY id', (error, results) => {
+    if (error) {
+      console.error('Erreur lors de la récupération des stands :', error);
+      return res.status(500).send('Erreur lors de la récupération des stands.');
+    }
+
+    // Rendre la page "choixStandAdmin" avec les données récupérées
+    res.render('choixStandAdmin', { title: 'Projet CashLess', nombreDeStands: results });
+  });
+});
+
+router.get('/ajouterStock', (req, res, next) => {
+  const standId = req.query.stand; // Récupérer l'ID du stand depuis la requête
+
+  // Exécuter une requête SQL pour récupérer les produits du stand avec leur prix et leur stock
+  const query1 = `
+    SELECT lesproduitsdesstands.id_produit, lesproduitsdesstands.stock, produit.nom, produit.prix
+    FROM lesproduitsdesstands
+    JOIN produit ON lesproduitsdesstands.id_produit = produit.id
+    WHERE lesproduitsdesstands.id_stand = ?
+  `;
+  connection.query(query1, [standId], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de la récupération des produits du stand :', error);
+      return res.status(500).send('Erreur lors de la récupération des produits du stand.');
+    }
+
+    // Ensuite, exécuter une requête SQL pour récupérer tous les noms de produits globaux
+    const query2 = 'SELECT id, nom FROM produit';
+    connection.query(query2, (error, produits_global) => {
+      if (error) {
+        console.error('Erreur lors de la récupération des produits globaux :', error);
+        return res.status(500).send('Erreur lors de la récupération des produits globaux.');
+      }
+
+      // Rendre la page "ajouterStock" avec les données récupérées
+      res.render('ajouterStock', { title: 'Projet CashLess', produits: results, produits_global: produits_global, idstand: standId});
+    });
+  });
+});
+
+router.post('/modifierStock', (req, res, next) => {
+  const standId = req.query.stand; // Récupérer l'ID du stand depuis la requête
+  const standNom = req.body.nom; // Récupérer le nom du stand depuis le formulaire
+  const produits = req.body.produits; // Récupérer la liste des produits avec leurs nouveaux stocks depuis le formulaire
+
+  // Parcourir la liste des produits pour mettre à jour le stock de chaque produit dans la table "lesproduitsdesstands"
+  produits.forEach(produit => {
+    const idProduit = produit.id;
+    const nouveauStock = req.body[`stock_${idProduit}`]; // Récupérer le nouveau stock à partir de req.body
+
+    // Mettre à jour le stock du produit dans la table "lesproduitsdesstands"
+    const updateQuery = 'UPDATE lesproduitsdesstands SET stock = ? WHERE id_produit = ? AND id_stand = ?';
+    connection.query(updateQuery, [nouveauStock, idProduit, standId], (err, results) => {
+      if (err) {
+        console.error('Erreur lors de la mise à jour du stock du produit :', err);
+        // Envoyer une réponse d'erreur au client
+        return res.status(500).send('Erreur lors de la mise à jour du stock du produit.');
+      }
+    });
+  });
+
+  // Envoyer une réponse de succès au client
+  res.status(200).send('Stock des produits mis à jour avec succès.');
+});
+
+
+
+
+
+
 
 module.exports = router;
 

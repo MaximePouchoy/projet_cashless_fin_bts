@@ -1,94 +1,61 @@
 <% include header.ejs %>
 
-<form action="/creerProduit" method="POST" class="form-container">
-    <div class="title-container">
-        <div class="main-title"><%= title %></div>
-    </div>
+<div class="title-container">
+    <div class="main-title">Modifier le stock de <%=idstand%></div>
+</div>
 
-    <br>
-    <br>
-    <br>
+<form action="/modifierStock?stand=<%=idstand%>" method="POST" class="form-container"> <!-- Ajoutez l'ID du stand à l'URL du formulaire -->
+    <label for="nom" class="subtitle_stand">Nom du stand :</label>
+    <input type="text" id="nom" name="nom" required><br>
+    <label for="produitDuStand" class="subtitle_stand">Produits du stand :</label>
+    <% produits.forEach(produit => { %>
+        <div class="product-container">
+            <input type="hidden" name="produits[]" value="<%= produit.id %>">
+            <label for="stock_<%= produit.id %>"><%= produit.nom %> :</label>
+            <input type="number" id="stock_<%= produit.id %>" name="stock_<%= produit.id %>"
+                   placeholder="Nouveau stock" min="0" required><br>
+        </div>
+    <% }); %>
 
-    <div class="product-container">
-        <table>
-            <tr>
-                <th>Nom du Produit</th>
-                <th>Prix</th>
-                <th>Stock</th>
-                <th>Quantité à ajouter</th>
-            </tr>
-            <% produits.forEach(produit => { %>
-                <tr>
-                    <td><%= produit.nom %></td>
-                    <td><%= produit.prix %> €</td>
-                    <td><%= produit.stock %></td>
-                    <td>
-                        <!-- Boutons pour augmenter ou diminuer la quantité -->
-                        <button onclick="decrementQuantity(<%= produit.id_produit %>)">-</button>
-                        <span id="quantity_<%= produit.id_produit %>">0</span>
-                        <button onclick="incrementQuantity(<%= produit.id_produit %>)">+</button>
-                    </td>
-                </tr>
-            <% }); %>
-        </table>
-    </div>
-
-    <br>
-    <br>
-    <br>
-
-    <div class="product-container">
-        <h2>Produits Globaux</h2>
-        <table>
-            <tr>
-                <th>Nom du Produit</th>
-                <th>Quantité à ajouter</th>
-            </tr>
-            <% produits_global.forEach(produit => {
-                // Vérifier si le produit est déjà présent dans la liste des produits du stand
-                const isPresentInStand = produits.find(prod => prod.id_produit === produit.id);
-            if (!isPresentInStand) { // Exclure les produits déjà présents dans le stand
-            %>
-            <tr>
-                <td><%= produit.nom %></td>
-                <td>
-                    <!-- Boutons pour augmenter ou diminuer la quantité -->
-                    <button onclick="decrementQuantity(<%= produit.id %>)">-</button>
-                    <span id="quantity_<%= produit.id %>">0</span>
-                    <button onclick="incrementQuantity(<%= produit.id %>)">+</button>
-                </td>
-            </tr>
-            <% }
-            }); %>
-        </table>
-    </div>
-
-    <br>
-    <br>
-    <br>
-    <div class="retour-boutton">
-        <a href="/vente"><button class="submit-button">Retour aux stands</button></a>
-    </div>
-
+    <button type="submit">Modifier Stock</button>
 </form>
 
-<script>
-    // Fonction pour incrémenter la quantité
-    function incrementQuantity(productId) {
-        var quantityElement = document.getElementById('quantity_' + productId);
-        var currentQuantity = parseInt(quantityElement.innerText);
-        quantityElement.innerText = currentQuantity + 1;
-    }
 
-    // Fonction pour décrémenter la quantité
-    function decrementQuantity(productId) {
-        var quantityElement = document.getElementById('quantity_' + productId);
-        var currentQuantity = parseInt(quantityElement.innerText);
-        if (currentQuantity > 0) {
-            quantityElement.innerText = currentQuantity - 1;
+<script>
+    document.querySelector('form').addEventListener('submit', function(event) {
+        let valid = true;
+
+        // Validation du champ de saisie du nom du stand
+        const nomInput = document.getElementById('nom');
+        if (!nomInput.value) {
+            valid = false;
+            nomInput.classList.add('error-input');
+            nomInput.insertAdjacentHTML('afterend', '<span class="error-message">Veuillez entrer un nom pour le stand.</span>');
+        } else {
+            nomInput.classList.remove('error-input');
+            const errorMessage = nomInput.nextElementSibling;
+            if (errorMessage) errorMessage.remove();
         }
-    }
+
+        // Validation du nouveau stock pour chaque produit
+        <% produits.forEach(produit => { %>
+        const stock_<%= produit.id %> = document.getElementById('stock_<%= produit.id %>');
+        if (!stock_<%= produit.id %>.value || stock_<%= produit.id %>.value < 0) {
+            valid = false;
+            stock_<%= produit.id %>.classList.add('error-input');
+            stock_<%= produit.id %>.insertAdjacentHTML('afterend', '<span class="error-message">Le nouveau stock doit être un nombre positif.</span>');
+        } else {
+            stock_<%= produit.id %>.classList.remove('error-input');
+            const errorMessage = stock_<%= produit.id %>.nextElementSibling;
+            if (errorMessage) errorMessage.remove();
+        }
+        <% }); %>
+
+        // Si l'une des validations échoue, on empêche la soumission du formulaire
+        if (!valid) {
+            event.preventDefault();
+        }
+    });
 </script>
 
-</body>
 </html>
