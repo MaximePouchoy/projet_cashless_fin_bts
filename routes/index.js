@@ -28,27 +28,27 @@ router.post('/api/data', (req, res) => {
 
   const tagCarte = req.body.TAG;
   const soldeCarte = req.body.MODIF_SOLDE;
-        const updateQuery = 'UPDATE carte SET solde = solde + ? WHERE tag = ?';
-        connection.execute(updateQuery, [soldeCarte, tagCarte], (err, updateResults) => {
-          if (err) {
-            console.error('Erreur lors de la mise à jour du solde :', err);
-            res.status(500).send('Erreur lors de la mise à jour du solde.');
-          } else {
-            console.log('Solde de la carte mis à jour avec succès.');
-            // Récupérer le nouveau solde de la carte après la mise à jour
-            const newQuery = `SELECT solde FROM carte WHERE tag = ?`;
-            connection.query(newQuery, [tagCarte], (error, newResults, fields) => {
-              if (error) {
-                console.error('Erreur lors de la récupération du nouveau solde :', error);
-                res.status(500).json({ error: 'Erreur lors de la récupération du nouveau solde.' });
-              } else {
-                const newSoldeCarte = newResults[0].solde;
-                // Renvoyer un JSON avec la confirmation et le nouveau solde de la carte
-                res.json({ Resultat: "Solde mis à jour", Carte: tagCarte, NouveauSolde: newSoldeCarte });
-              }
-            });
-          }
-        });
+  const updateQuery = 'UPDATE carte SET solde = solde + ? WHERE tag = ?';
+  connection.execute(updateQuery, [soldeCarte, tagCarte], (err, updateResults) => {
+    if (err) {
+      console.error('Erreur lors de la mise à jour du solde :', err);
+      res.status(500).send('Erreur lors de la mise à jour du solde.');
+    } else {
+      console.log('Solde de la carte mis à jour avec succès.');
+      // Récupérer le nouveau solde de la carte après la mise à jour
+      const newQuery = `SELECT solde FROM carte WHERE tag = ?`;
+      connection.query(newQuery, [tagCarte], (error, newResults, fields) => {
+        if (error) {
+          console.error('Erreur lors de la récupération du nouveau solde :', error);
+          res.status(500).json({ error: 'Erreur lors de la récupération du nouveau solde.' });
+        } else {
+          const newSoldeCarte = newResults[0].solde;
+          // Renvoyer un JSON avec la confirmation et le nouveau solde de la carte
+          res.json({ Resultat: "Solde mis à jour", Carte: tagCarte, NouveauSolde: newSoldeCarte });
+        }
+      });
+    }
+  });
 });
 
 router.post('/api/connexion', (req, res) => {
@@ -337,59 +337,79 @@ router.get('/choixStandAdmin', (req, res) => {
 });
 
 router.get('/ajouterStock', (req, res, next) => {
-  const standId = req.query.stand; // Récupérer l'ID du stand depuis la requête
+  const standId = req.query.stand; // Récupère l'ID du stand depuis les paramètres de la requête
 
-  // Exécuter une requête SQL pour récupérer les produits du stand avec leur prix et leur stock
-  const query1 = `
-    SELECT lesproduitsdesstands.id_produit, lesproduitsdesstands.stock, produit.nom, produit.prix
-    FROM lesproduitsdesstands
-    JOIN produit ON lesproduitsdesstands.id_produit = produit.id
-    WHERE lesproduitsdesstands.id_stand = ?
-  `;
-  connection.query(query1, [standId], (error, results) => {
+  connection.query('SELECT * FROM produit', (error, produits) => {
     if (error) {
-      console.error('Erreur lors de la récupération des produits du stand :', error);
-      return res.status(500).send('Erreur lors de la récupération des produits du stand.');
+      console.error('Erreur lors de la récupération des produits :', error);
+      produits = [];
     }
 
-    // Ensuite, exécuter une requête SQL pour récupérer tous les noms de produits globaux
-    const query2 = 'SELECT id, nom FROM produit';
-    connection.query(query2, (error, produits_global) => {
-      if (error) {
-        console.error('Erreur lors de la récupération des produits globaux :', error);
-        return res.status(500).send('Erreur lors de la récupération des produits globaux.');
-      }
-
-      // Rendre la page "ajouterStock" avec les données récupérées
-      res.render('ajouterStock', { title: 'Projet CashLess', produits: results, produits_global: produits_global, idstand: standId});
-    });
-  });
-});
-
-router.post('/modifierStock', (req, res, next) => {
-  const standId = req.query.stand; // Récupérer l'ID du stand depuis la requête
-  const standNom = req.body.nom; // Récupérer le nom du stand depuis le formulaire
-  const produits = req.body.produits; // Récupérer la liste des produits avec leurs nouveaux stocks depuis le formulaire
-
-  // Parcourir la liste des produits pour mettre à jour le stock de chaque produit dans la table "lesproduitsdesstands"
-  produits.forEach(produit => {
-    const idProduit = produit.id;
-    const nouveauStock = req.body[`stock_${idProduit}`]; // Récupérer le nouveau stock à partir de req.body
-
-    // Mettre à jour le stock du produit dans la table "lesproduitsdesstands"
-    const updateQuery = 'UPDATE lesproduitsdesstands SET stock = ? WHERE id_produit = ? AND id_stand = ?';
-    connection.query(updateQuery, [nouveauStock, idProduit, standId], (err, results) => {
+    // Récupérer les produits du stand
+    connection.query('SELECT * FROM lesproduitsdesstands WHERE id_stand = ?', [standId], (err, produitsStand) => {
       if (err) {
-        console.error('Erreur lors de la mise à jour du stock du produit :', err);
-        // Envoyer une réponse d'erreur au client
-        return res.status(500).send('Erreur lors de la mise à jour du stock du produit.');
+        console.error('Erreur lors de la récupération des produits du stand :', err);
+        produitsStand = [];
       }
+
+      // Récupérer le nom du stand
+      connection.query('SELECT nom FROM stand WHERE id = ?', [standId], (err, stand) => {
+        if (err) {
+          console.error('Erreur lors de la récupération du nom du stand :', err);
+          stand = [];
+        }
+
+        const nomStand = (stand.length > 0) ? stand[0].nom : '';
+
+        // Passer les produits, les produits du stand et le nom du stand à la vue
+        res.render('ajouterStock', { title: 'Ajouter un stand', produits, produitsStand, idStand: standId, nomStand: nomStand });
+      });
     });
   });
-
-  // Envoyer une réponse de succès au client
-  res.status(200).send('Stock des produits mis à jour avec succès.');
 });
+
+
+// Express route pour gérer la requête POST du formulaire
+router.post('/modifierStock/:idStand', (req, res) => {
+  const idStand = req.params.idStand; // Récupère l'ID du stand depuis les paramètres de la requête
+  const produits = req.body.produits;
+
+  produits.forEach(produitId => {
+    const stock = req.body['stock_' + produitId];
+
+    // Vérifier si le stock est différent de zéro avant de poursuivre
+    if (stock !== 0 && stock !== "") {
+      // Vérifier si une entrée existe déjà pour ce stand et ce produit
+      connection.query('SELECT * FROM lesproduitsdesstands WHERE id_stand = ? AND id_produit = ?', [idStand, produitId], (err, results) => {
+        if (err) {
+          // Gérer les erreurs de la requête SQL
+          return res.status(500).send('Erreur lors de la vérification de l\'existence de l\'entrée dans la base de données');
+        }
+
+        if (results.length > 0) {
+          // Une entrée existe déjà, effectuer une mise à jour
+          connection.query('UPDATE lesproduitsdesstands SET stock = stock + ? WHERE id_stand = ? AND id_produit = ?', [stock, idStand, produitId], (err, updateResult) => {
+            if (err) {
+              // Gérer les erreurs de la requête SQL
+              return res.status(500).send('Erreur lors de la mise à jour de l\'entrée dans la base de données');
+            }
+          });
+        } else {
+          // Aucune entrée existante, effectuer une insertion
+          connection.query('INSERT INTO lesproduitsdesstands (id_stand, id_produit, stock) VALUES (?, ?, ?)', [idStand, produitId, stock], (err, insertResult) => {
+            if (err) {
+              // Gérer les erreurs de la requête SQL
+              return res.status(500).send('Erreur lors de l\'insertion de l\'entrée dans la base de données');
+            }
+          });
+        }
+      });
+    }
+  });
+  res.redirect("/pageAdmin")
+});
+
+
 
 
 
@@ -398,9 +418,3 @@ router.post('/modifierStock', (req, res, next) => {
 
 
 module.exports = router;
-
-
-
-
-
-

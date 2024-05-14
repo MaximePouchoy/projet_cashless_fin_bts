@@ -421,4 +421,9 @@ input[type="password"]:disabled {
 input[type="password"]:enabled {
   border: 2px solid #000;
 }
-
+.stand-title{
+  text-align: center; /* Pour centrer le texte */
+  font-weight: bold; /* Pour mettre le texte en gras */
+  font-size: 40px; /* Pour définir une taille de police plus grande */
+  text-decoration: underline;;
+}

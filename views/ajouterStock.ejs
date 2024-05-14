@@ -1,60 +1,65 @@
 <% include header.ejs %>
 
 <div class="title-container">
-    <div class="main-title">Modifier le stock de <%=idstand%></div>
+    <div class="main-title">Modification du stock du stand :</div>
 </div>
+<br>
+<br>
+<form action="/modifierStock/<%= idStand %>" method="POST" class="form-container" id="standForm">
 
-<form action="/modifierStock?stand=<%=idstand%>" method="POST" class="form-container"> <!-- Ajoutez l'ID du stand à l'URL du formulaire -->
-    <label for="nom" class="subtitle_stand">Nom du stand :</label>
-    <input type="text" id="nom" name="nom" required><br>
+    <div class="stand-title">Stand : <%=nomStand%></div>
+    <br>
+    <br>
     <label for="produitDuStand" class="subtitle_stand">Produits du stand :</label>
-    <% produits.forEach(produit => { %>
+
+    <%
+    // Trier les produits en fonction de leur stock
+    const produitsAvecStock = produits.filter(produit => produitsStand.find(standProduit => standProduit.id_produit === produit.id));
+    const produitsSansStock = produits.filter(produit => !produitsStand.find(standProduit => standProduit.id_produit === produit.id));
+
+    produitsAvecStock.forEach(produit => { %>
+        <br>
         <div class="product-container">
-            <input type="hidden" name="produits[]" value="<%= produit.id %>">
-            <label for="stock_<%= produit.id %>"><%= produit.nom %> :</label>
-            <input type="number" id="stock_<%= produit.id %>" name="stock_<%= produit.id %>"
-                   placeholder="Nouveau stock" min="0" required><br>
+            <div>
+                <span><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %> :</span>
+                <br>
+                <br>
+                <input type="number" name="stock_<%= produit.id %>" placeholder="Stock à ajouter" min="0">
+            </div>
+            <div>
+                <label for="stock_<%= produit.id %>">Stock actuel : <%= produitsStand.find(standProduit => standProduit.id_produit === produit.id).stock %></label>
+                <p>_________________________________</p>
+            </div>
+        </div>
+    <% }); %>
+    <br>
+    <br>
+    <label for="produitDuStand" class="subtitle_stand">Produits non disponibles :</label>
+    <% produitsSansStock.forEach(produit => { %>
+        <div class="product-container">
+            <div>
+                <span><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %></span>
+                <input type="number" name="stock_<%= produit.id %>" placeholder="Stock à ajouter" min="0">
+            </div>
+            <div>
+                <label for="stock_<%= produit.id %>">Stock actuel : Pas disponible</label>
+            </div>
         </div>
     <% }); %>
 
-    <button type="submit">Modifier Stock</button>
+    <button type="submit">Créer Stand</button>
 </form>
 
-
 <script>
-    document.querySelector('form').addEventListener('submit', function(event) {
-        let valid = true;
-
-        // Validation du champ de saisie du nom du stand
-        const nomInput = document.getElementById('nom');
-        if (!nomInput.value) {
-            valid = false;
-            nomInput.classList.add('error-input');
-            nomInput.insertAdjacentHTML('afterend', '<span class="error-message">Veuillez entrer un nom pour le stand.</span>');
-        } else {
-            nomInput.classList.remove('error-input');
-            const errorMessage = nomInput.nextElementSibling;
-            if (errorMessage) errorMessage.remove();
-        }
-
-        // Validation du nouveau stock pour chaque produit
-        <% produits.forEach(produit => { %>
-        const stock_<%= produit.id %> = document.getElementById('stock_<%= produit.id %>');
-        if (!stock_<%= produit.id %>.value || stock_<%= produit.id %>.value < 0) {
-            valid = false;
-            stock_<%= produit.id %>.classList.add('error-input');
-            stock_<%= produit.id %>.insertAdjacentHTML('afterend', '<span class="error-message">Le nouveau stock doit être un nombre positif.</span>');
-        } else {
-            stock_<%= produit.id %>.classList.remove('error-input');
-            const errorMessage = stock_<%= produit.id %>.nextElementSibling;
-            if (errorMessage) errorMessage.remove();
-        }
-        <% }); %>
-
-        // Si l'une des validations échoue, on empêche la soumission du formulaire
-        if (!valid) {
-            event.preventDefault();
-        }
+    // Intercepter la soumission du formulaire pour remplir automatiquement les champs non cochés avec 0
+    document.getElementById('standForm').addEventListener('submit', function(event) {
+        // Récupérer toutes les cases cochées
+        const checkedCheckboxes = document.querySelectorAll('input[name="produits_checkbox"]:checked');
+        // Pour chaque case cochée, activer le champ de stock associé
+        checkedCheckboxes.forEach(checkbox => {
+            const stockInput = document.querySelector(`input[name="stock_${checkbox.value}"]`);
+            stockInput.disabled = false;
+        });
     });
 </script>
 
