@@ -7,6 +7,7 @@
 <br>
 <form action="/modifierStock/<%= idStand %>" method="POST" class="form-container" id="standForm">
 
+
     <div class="stand-title">Stand : <%=nomStand%></div>
     <br>
     <br>
@@ -20,16 +21,14 @@
     produitsAvecStock.forEach(produit => { %>
         <br>
         <div class="product-container">
-            <div>
-                <span><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %> :</span>
-                <br>
-                <br>
-                <input type="number" name="stock_<%= produit.id %>" placeholder="Stock initial" min="0">
-            </div>
-            <div>
-                <label for="stock_<%= produit.id %>">Stock actuel : <%= produitsStand.find(standProduit => standProduit.id_produit === produit.id).stock %></label>
-                <p>____________________________</p>
-            </div>
+            <input type="hidden" name="produits" value="<%= produit.id %>">
+            <label for="stock_<%= produit.id %>"><%=produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1)%>
+                <br><br>
+            <input type="number" name="stock_<%= produit.id %>"
+                   placeholder="Stock initial" min="0">
+            <br>
+            <label>Stock actuel : <%= produitsStand.find(standProduit => standProduit.id_produit === produit.id).stock %></label></label>
+            <p>________________________</p>
         </div>
     <% }); %>
     <br>
@@ -37,17 +36,15 @@
     <label for="produitDuStand" class="subtitle_stand">Produits non disponibles :</label>
     <% produitsSansStock.forEach(produit => { %>
         <div class="product-container">
-            <div>
-                <span><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %></span>
-                <input type="number" name="stock_<%= produit.id %>" placeholder="Stock initial" min="0">
-            </div>
-            <div>
-                <label for="stock_<%= produit.id %>">Stock actuel : Pas disponible</label>
-            </div>
+            <input type="hidden" name="produits" value="<%= produit.id %>">
+            <label for="stock_<%= produit.id %>"><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %></label>
+            <input type="number" name="stock_<%= produit.id %>"
+                   placeholder="Stock initial" min="0"><br>
+            <label> Stock actuel : Pas disponible</label>
         </div>
     <% }); %>
 
-    <button type="submit">Créer Stand</button>
+    <button type="submit">Modifier Stock</button>
 </form>
 
 <script>

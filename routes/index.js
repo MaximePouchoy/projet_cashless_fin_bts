@@ -54,7 +54,7 @@ router.post('/api/data', (req, res) => {
 router.post('/api/connexion', (req, res) => {
   res.set('Access-Control-Allow-Origin', '*');
 
-  const login = req.body.LOGIN;
+   login = req.body.LOGIN;
   const motDePasse = req.body.PASSWORD;
 
   const query = `SELECT * FROM benevole WHERE login = ? AND password = ?`;
@@ -66,6 +66,7 @@ router.post('/api/connexion', (req, res) => {
       if (results.length > 0) {
         const droitID = results[0].id_droits;
         res.json({ authentifie: true, id_droit: droitID });
+        console.log(login, motDePasse)
       } else {
         res.json({ authentifie: false });
       }
@@ -107,17 +108,15 @@ router.post('/crediter', (req, res, next) => {
 
 // Route pour afficher la page de vente
 router.get('/vente', (req, res, next) => {
-  // Exécute une requête SQL pour récupérer le nombre de stands
+  // Exécuter une requête SQL pour récupérer tous les stands
   connection.query('SELECT * FROM stand ORDER BY id', (error, results) => {
     if (error) {
-      throw error;
+      console.error('Erreur lors de la récupération des stands :', error);
+      return res.status(500).send('Erreur lors de la récupération des stands.');
     }
-    // Récupère le nombre de stands
-    const nombreDeStands = results[0].nombre_de_stands;
-    // Rend la page "vente" avec le nombre de stands comme variable
-    res.render('vente', { title: 'Projet CashLess', nombreDeStands: results });
-    console.log('Résultats de la requête :', results.length );
-    console.log('Résultats de la requête :'  + results[0].nom);
+
+    // Rendre la page "choixStandAdmin" avec les données récupérées
+    res.render('choixStandAdmin', { title: 'Projet CashLess', nombreDeStands: results });
   });
 });
 
@@ -147,19 +146,34 @@ router.get('/vente-articles', (req, res, next) => {
 
 // Route pour afficher la page de vente des stocks
 router.get('/vente-stock', (req, res, next) => {
-  // Exécute une requête SQL pour récupérer les produits avec leur prix et leur stock
-  const query = `
-    SELECT lesproduitsdesstands.id_produit, lesproduitsdesstands.stock, produit.nom, produit.prix 
-    FROM lesproduitsdesstands 
-    JOIN produit ON lesproduitsdesstands.id_produit = produit.id
-    WHERE lesproduitsdesstands.id_stand = ?
-  `;
-  connection.query(query, [req.query.stand], (error, results) => {
+  const standId = req.query.stand; // Récupère l'ID du stand depuis les paramètres de la requête
+
+  connection.query('SELECT * FROM produit', (error, produits) => {
     if (error) {
-      throw error;
+      console.error('Erreur lors de la récupération des produits :', error);
+      produits = [];
     }
-    // Rend la page "vente-articles" avec les données récupérées
-    res.render('vente-stock', { title: 'Projet CashLess', produits: results });
+
+    // Récupérer les produits du stand
+    connection.query('SELECT * FROM lesproduitsdesstands WHERE id_stand = ?', [standId], (err, produitsStand) => {
+      if (err) {
+        console.error('Erreur lors de la récupération des produits du stand :', err);
+        produitsStand = [];
+      }
+
+      // Récupérer le nom du stand
+      connection.query('SELECT nom FROM stand WHERE id = ?', [standId], (err, stand) => {
+        if (err) {
+          console.error('Erreur lors de la récupération du nom du stand :', err);
+          stand = [];
+        }
+
+        const nomStand = (stand.length > 0) ? stand[0].nom : '';
+
+        // Passer les produits, les produits du stand et le nom du stand à la vue
+        res.render('vente-stock', { title: 'Ajouter un stand', produits, produitsStand, idStand: standId, nomStand: nomStand });
+      });
+    });
   });
 });
 
@@ -205,29 +219,45 @@ router.post('/connectionBenevole', (req, res) => {
   const { login, mdp } = req.body;
 
   if (!login || !mdp) {
-    return res.send('<script>alert("veuillez indiquer un mot de passe et un login"); window.location.href = "/";</script>')
+    return res.send('<script>alert("Veuillez indiquer un nom d\'utilisateur et un mot de passe."); window.location.href = "/";</script>');
   }
 
   connection.query('SELECT id_droits FROM benevole WHERE login = ? AND password = ?', [login, mdp], (error, results) => {
     if (error) {
-      throw error;
+      // Gérer les erreurs de la requête SQL
+      return res.status(500).send('<script>alert("Erreur lors de l\'authentification. Veuillez réessayer."); window.location.href = "/";</script>');
     }
 
     if (results.length === 0) {
       return res.send('<script>alert("Identifiants invalides. Veuillez réessayer."); window.location.href = "/";</script>');
-    } else {
-      const id_droit = results[0].id_droits;
+    }
 
-      if (id_droit === 2) {
-        res.redirect('/vente');
-      } else if (id_droit === 1) {
-        res.redirect('/scancarte');
-      } else if (id_droit === 3){
-        res.redirect('/pageAdmin');
-      }
+    const id_droit = results[0].id_droits;
+
+    if (id_droit === 2) {
+      connection.query('SELECT id_stand FROM lesbenevolesdesstands JOIN benevole b ON id_benevole = b.id WHERE b.login = ? AND b.password = ?', [login, mdp], (error, idstand) => {
+        if (error) {
+          // Gérer les erreurs de la requête SQL
+          return res.status(500).send('<script>alert("Erreur lors de la récupération des informations de stand. Veuillez réessayer."); window.location.href = "/";</script>');
+        }
+
+        if (idstand.length > 0) {
+          // Rediriger avec le paramètre idstand
+          res.redirect(`/choixvente?stand=${idstand[0].id_stand}`);
+        } else {
+          // Gérer le cas où aucun stand n'est associé à ce bénévole
+          res.send('<script>alert("Aucun stand associé à ce compte."); window.location.href = "/";</script>');
+        }
+      });
+    } else if (id_droit === 1) {
+      res.redirect('/scancarte');
+    } else if (id_droit === 3) {
+      res.redirect('/pageAdmin');
     }
   });
 });
+
+
 router.get('/pageAdmin', (req, res) => {
   res.render('pageAdmin', { title: 'page Admin CashLess' });
 });
@@ -409,6 +439,49 @@ router.post('/modifierStock/:idStand', (req, res) => {
   res.redirect("/pageAdmin")
 });
 
+router.post('/stockBenevole/:idStand', (req, res) => {
+  const idStand = req.params.idStand; // Récupère l'ID du stand depuis les paramètres de la requête
+  const produits = req.body.produits;
+
+  if (!produits) {
+    // Vérifier si req.body.produits est défini
+    return res.status(400).send("Aucun produit n'a été fourni.");
+  }
+
+  produits.forEach(produitId => {
+    const stock = req.body['stock_' + produitId];
+
+    // Vérifier si le stock est différent de zéro avant de poursuivre
+    if (stock !== 0 && stock !== "") {
+      // Vérifier si une entrée existe déjà pour ce stand et ce produit
+      connection.query('SELECT * FROM lesproduitsdesstands WHERE id_stand = ? AND id_produit = ?', [idStand, produitId], (err, results) => {
+        if (err) {
+          // Gérer les erreurs de la requête SQL
+          return res.status(500).send("Erreur lors de la vérification de l'existence de l'entrée dans la base de données");
+        }
+
+        if (results.length > 0) {
+          // Une entrée existe déjà, effectuer une mise à jour
+          connection.query('UPDATE lesproduitsdesstands SET stock = stock + ? WHERE id_stand = ? AND id_produit = ?', [stock, idStand, produitId], (err, updateResult) => {
+            if (err) {
+              // Gérer les erreurs de la requête SQL
+              return res.status(500).send("Erreur lors de la mise à jour de l'entrée dans la base de données");
+            }
+          });
+        } else {
+          // Aucune entrée existante, effectuer une insertion
+          connection.query('INSERT INTO lesproduitsdesstands (id_stand, id_produit, stock) VALUES (?, ?, ?)', [idStand, produitId, stock], (err, insertResult) => {
+            if (err) {
+              // Gérer les erreurs de la requête SQL
+              return res.status(500).send("Erreur lors de l'insertion de l'entrée dans la base de données");
+            }
+          });
+        }
+      });
+    }
+  });
+  res.redirect(`/choixvente?stand=${idStand}`);
+});
 
 
 

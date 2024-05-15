@@ -171,7 +171,7 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   width: 204px;
-  background-image: url('/images/dark_check.png');
+  background-image: url('../images/dark_check.png');
 }
 .submit-button:hover {
   background-color: black;
@@ -202,7 +202,7 @@ body {
   display: inline-block;
   width: 100px; /* Largeur de l'image */
   height: 100px; /* Hauteur de l'image */
-  background-image: url("/images/stand.png"); /* Image de fond */
+  background-image: url("../images/stand.png"); /* Image de fond */
   background-size: cover; /* Ajuste la taille de l'image pour couvrir le conteneur */
   border-radius: 15px; /* Coins arrondis */
   background-position: center; /* Centre l'image horizontalement */
@@ -211,7 +211,7 @@ body {
 
 /* Au survol de la classe stand */
 .stand:hover .stand-image {
-  background-image: url("/images/stand-modified.png"); /* Changement de l'image de fond au survol */
+  background-image: url("../images/stand-modified.png"); /* Changement de l'image de fond au survol */
 }
 
 
