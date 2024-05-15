@@ -5,7 +5,7 @@
 </div>
 <br>
 <br>
-<form action="/stockBenevole<%=idStand %>" method="POST" class="form-container" id="standForm">
+<form action="/stockBenevole/<%=idStand %>" method="POST" class="form-container" id="standForm">
 
     <div class="stand-title">Stand : <%=nomStand%></div>
     <br>
@@ -21,6 +21,7 @@
         <br>
         <div class="product-container">
             <div>
+                <input type="hidden" name="produits" value="<%= produit.id %>">
                 <span><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %> :</span>
                 <br>
                 <br>
@@ -38,6 +39,7 @@
     <% produitsSansStock.forEach(produit => { %>
         <div class="product-container">
             <div>
+                <input type="hidden" name="produits" value="<%= produit.id %>">
                 <span><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %></span>
                 <input type="number" name="stock_<%= produit.id %>" placeholder="Stock initial" min="0">
             </div>
@@ -49,6 +51,10 @@
 
     <button type="submit">Modifier Stock</button>
 </form>
+
+<div class="retour-boutton">
+    <a href="/choixvente?stand=<%=idStand%>"><button class="submit-button">Retour aux choix</button></a>
+</div>
 
 <script>
     // Intercepter la soumission du formulaire pour remplir automatiquement les champs non cochés avec 0

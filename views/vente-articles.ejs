@@ -7,29 +7,26 @@
 <br>
 <br>
 <br>
-<div class="product-container">
-    <table>
-        <tr>
-            <th>Nom du Produit</th>
-            <th>Prix</th>
-            <th>Stock</th>
-            <th>Quantité commandée</th>
-        </tr>
+<form action="/commandeBenevole/<%=standId%>" method="POST" class="form-container" id="standForm">
+    <div class="product-container">
         <% produits.forEach(produit => { %>
-            <tr>
-                <td><%= produit.nom %></td>
-                <td><%= produit.prix %> €</td>
-                <td><%= produit.stock %></td>
-                <td>
-                    <!-- Boutons pour augmenter ou diminuer la quantité -->
-                    <button onclick="decrementQuantity(<%= produit.id_produit %>)">-</button>
-                    <span id="quantity_<%= produit.id_produit %>">0</span>
-                    <button onclick="incrementQuantity(<%= produit.id_produit %>)">+</button>
-                </td>
-            </tr>
+            <div>
+                <label class="product_title" for="stock_<%= produit.id %>"><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %></label>
+                <input type="number" name="idproduit_<%= produit.id %>" placeholder="Nombre de produits demandés" min="0" hidden value="<%=produit.id%>">
+                <br>
+                <label for="stock_<%= produit.id %>">Stock du Produit : <%= produit.stock %></label>
+                <br>
+                <label for="prix_<%= produit.id %>">Prix du Produit : <%= produit.prix %> €</label>
+                <br>
+                <label for="quantite_<%= produit.id %>">Combien de produits sont demandés ? :</label>
+                <br>
+                <input type="number" name="quantite_<%= produit.id %>" placeholder="Nombre de produits demandés" min="0">
+                <p>____________________________</p>
+            </div>
         <% }); %>
-    </table>
-</div>
+    </div>
+    <button type="submit">Ajouter Produit</button>
+</form>
 
 <br>
 <br>
@@ -37,6 +34,9 @@
 <div class="retour-boutton">
     <a href="/vente"><button class="submit-button">Retour aux stands</button></a>
 </div>
+
+
+
 
 <script>
     // Fonction pour incrémenter la quantité

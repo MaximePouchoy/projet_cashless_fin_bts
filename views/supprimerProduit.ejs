@@ -1,0 +1,20 @@
+<% include header.ejs %>
+<div class="title-container">
+    <div class="main-title">Choisir le produit à supprimer</div>
+</div>
+<br><br>
+<form action="/supprProduit" method="POST" class="form-container">
+    <label for="benevole">Choisir un produit :</label>
+    <select name="id" id="produit">
+        <% produits.forEach(produit => { %>
+            <option value="<%= produit.id %>"><%= produit.nom %></option>
+        <% }); %>
+    </select>
+    <button type="submit">Supprimer</button>
+</form>
+<br><br>
+<div class="retour-boutton">
+    <a href="/pageAdmin"><button class="submit-button">Retour a la page Admin</button></a>
+</div>
+<br><br>
+

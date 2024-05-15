@@ -1,3 +1,5 @@
+
+
 <% include header.ejs%>
 
 <div class="title-container">
@@ -6,17 +8,17 @@
 </div>
 <br>
 <br>
-<form method="post" action="/creationBenevole" class="form-container">
+<form method="post" action="/modifBenevole/<%=benevole.id%>" class="form-container">
     <label class="subtitle_stand">Entrez un nom</label>
-    <input type="text" class="input-box" id="nom" name="nom">
+    <input type="text" class="input-box" id="nom" name="nom" value="<%=benevole.nom%>">
     <span id="nom-error" class="error-message"></span><br>
     <!-- Ajout d'un champ pour le prénom -->
     <label class="subtitle_stand">Entrez un prénom</label>
-    <input type="text" class="input-box" id="prenom" name="prenom">
+    <input type="text" class="input-box" id="prenom" name="prenom"value="<%=benevole.prenom%>">
     <span id="prenom-error" class="error-message"></span><br>
     <!-- Ajout d'un champ pour le login -->
     <label class="subtitle_stand">Entrez un Login</label>
-    <input type="text" class="input-box" id="login" name="login">
+    <input type="text" class="input-box" id="login" name="login"value="<%=benevole.login%>">
     <span id="login-error" class="error-message"></span><br>
     <!-- Ajout d'un champ pour le mot de passe -->
     <label class="subtitle_stand">Entrez un mot de passe</label>
@@ -28,7 +30,7 @@
     <span id="mdpConfirm-error" class="error-message"></span><br>
     <!-- Ajout d'un champ pour sélectionner le droit -->
     <label class="subtitle_stand">Entrez un droit</label>
-    <select class="input-box" id="droit" name="droit">
+    <select class="input-box" id="droit" name="droit" ">
         <option value="1">Créditeur</option>
         <option value="2">Vendeur</option>
         <option value="3">Admin</option>
@@ -45,11 +47,11 @@
     <!-- Bouton de soumission du formulaire -->
     <button type="submit">Créer le compte</button>
 </form>
-
 <br><br>
 <div class="retour-boutton">
-    <a href="/pageAdmin"><button class="submit-button">Retour à la page Admin</button></a>
-</div><br><br>
+    <a href="/choisirBenevole"><button class="submit-button">Retour au choix de benevole</button></a>
+</div>
+<br><br>
 </body>
 <script>
     document.querySelector('form').addEventListener('submit', function(event) {

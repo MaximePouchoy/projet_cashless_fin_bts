@@ -1,0 +1,20 @@
+<% include header.ejs %>
+<div class="title-container">
+    <div class="main-title">Choisir le bénévole à modifier</div>
+</div>
+<br><br>
+<form action="/modifierBenevole" method="GET" class="form-container">
+    <label for="benevole">Choisir un bénévole :</label>
+    <select name="id" id="benevole">
+        <% benevoles.forEach(benevole => { %>
+            <option value="<%= benevole.id %>"><%= benevole.nom %>, <%= benevole.prenom %></option>
+        <% }); %>
+    </select>
+    <button type="submit">Modifier</button>
+</form>
+<br><br>
+<div class="retour-boutton">
+    <a href="/pageAdmin"><button class="submit-button">Retour a la page Admin</button></a>
+</div>
+<br><br>
+

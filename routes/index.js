@@ -74,6 +74,7 @@ router.post('/api/connexion', (req, res) => {
   });
 });
 
+
 // Route pour afficher la page d'accueil
 router.get('/', (req, res, next) => {
   // Exécute une requête SQL pour récupérer les produits
@@ -128,6 +129,7 @@ router.get('/credit', (req, res, next) => {
 });
 
 router.get('/vente-articles', (req, res, next) => {
+  const standId = req.query.stand;
   // Exécute une requête SQL pour récupérer les produits avec leur prix et leur stock
   const query = `
     SELECT lesproduitsdesstands.id_produit, lesproduitsdesstands.stock, produit.nom, produit.prix 
@@ -140,7 +142,7 @@ router.get('/vente-articles', (req, res, next) => {
       throw error;
     }
     // Rend la page "vente-articles" avec les données récupérées
-    res.render('vente-articles', { title: 'Projet CashLess', produits: results });
+    res.render('vente-articles', { title: 'Projet CashLess', produits: results, standId });
   });
 });
 
@@ -265,38 +267,43 @@ router.get('/pageAdmin', (req, res) => {
 
 
 router.get('/ajouterBenevole', (req, res) => {
-  connection.query('SELECT * FROM stand ORDER BY id', (error, results) => {
+  connection.query('SELECT * FROM stand ORDER BY id', (error, stands) => {
     if (error) {
-      throw error;
+      console.error('Erreur lors de la récupération des stands :', error);
+      res.status(500).send('Erreur lors de la récupération des stands.');
+      return;
     }
-    // Récupère le nombre de stands
-    const nombreDeStands = results[0].nombre_de_stands;
-    // Rend la page "choixStandAdmin" avec le nombre de stands comme variable
-    res.render('ajouterBenevole', { title: 'page Admin CashLess', nombreDeStands: results });
-    console.log('Résultats de la requête :', results.length );
-    console.log('Résultats de la requête :'  + results[0].nom);
 
-    // Render la page "ajouterBenevole" après avoir obtenu les résultats de la première requête
-
+    res.render('ajouterBenevole', { title: 'Page Admin CashLess', stands });
   });
 });
 
+router.post('/creationBenevole', (req, res) => {
+  const { droit, nom, login, mdp, prenom, stand } = req.body;
 
-router.post('/CreationBenevole', (req, res) => {
-  const { droit, nom, login, mdp, prenom } = req.body;
-
-  // Utilisation de la requête paramétrée avec des placeholders
-  connection.query('INSERT INTO benevole (id_droits, nom, prenom, login, password) VALUES (?, ?, ?, ?, ?)', [droit, nom, prenom, login, mdp], (error, results) => {
+  // Insérer le bénévole dans la table 'benevole'
+  connection.query('INSERT INTO benevole (id_droits, nom, prenom, login, password) VALUES (?, ?, ?, ?, ?)', [droit, nom, prenom, login, mdp], (error, benevoleResult) => {
     if (error) {
       console.error('Erreur lors de l\'insertion dans la base de données :', error);
       res.status(500).json({ error: 'Erreur lors de la création du bénévole.' });
     } else {
       console.log('Bénévole inséré avec succès !');
-      // Ajout du code JavaScript pour afficher une alerte de confirmation
-      res.send('<script>alert("Bénévole ajouté avec succès !"); window.location.href = "/pageAdmin";</script>');
+
+      // Insérer le lien entre le bénévole et le stand dans la table 'lesbenevolesdesstands'
+      connection.query('INSERT INTO lesbenevolesdesstands (id_benevole, id_stand) VALUES (?, ?)', [benevoleResult.insertId, stand], (err, linkResult) => {
+        if (err) {
+          console.error('Erreur lors de l\'insertion dans la table lesbenevolesdesstands :', err);
+          res.status(500).json({ error: 'Erreur lors de la création du lien entre le bénévole et le stand.' });
+        } else {
+          console.log('Lien entre le bénévole et le stand ajouté avec succès !');
+          // Rediriger vers la page d'administration
+          res.send('<script>alert("Bénévole ajouté avec succès !"); window.location.href = "/pageAdmin";</script>');
+        }
+      });
     }
   });
 });
+
 
 router.get('/ajouterProduit', (req, res) => {
   res.render('ajouterProduit', { title: 'Ajouter un produit' });
@@ -436,7 +443,8 @@ router.post('/modifierStock/:idStand', (req, res) => {
       });
     }
   });
-  res.redirect("/pageAdmin")
+
+  res.send('<script>alert("Stock Modifié avec succès !"); window.location.href = "/pageAdmin";</script>');
 });
 
 router.post('/stockBenevole/:idStand', (req, res) => {
@@ -480,10 +488,233 @@ router.post('/stockBenevole/:idStand', (req, res) => {
       });
     }
   });
-  res.redirect(`/choixvente?stand=${idStand}`);
+
+  res.send('<script>alert("Stock modifié avec succès !"); window.location.href = `/choixvente?stand=${idStand}`;</script>');
+});
+
+router.get('/choisirBenevole', (req, res) => {
+  connection.query('SELECT * FROM benevole ORDER BY nom', (error, benevoles) => {
+    if (error) {
+      console.error('Erreur lors de la récupération des bénévoles :', error);
+      res.status(500).send('Erreur lors de la récupération des bénévoles.');
+      return;
+    }
+    res.render('choisirBenevole', { title: 'Choisir le bénévole à modifier', benevoles });
+  });
 });
 
 
+router.get('/modifierBenevole', (req, res) => {
+  const benevoleId = req.query.id; // Récupération de l'ID du bénévole depuis la requête
+  connection.query('SELECT * FROM benevole WHERE id = ?', [benevoleId], (error, benevole) => {
+    connection.query('SELECT * FROM stand ORDER BY id', (error, stands) => {
+    if (error || benevole.length === 0) {
+      console.error('Erreur lors de la récupération du bénévole :', error);
+      res.status(500).send('Erreur lors de la récupération du bénévole.');
+      return;
+    }
+    res.render('modifierBenevole', { title: 'Modifier le bénévole', benevole: benevole[0],stands });
+  });
+  });
+});
+
+router.post('/modifBenevole/:id', (req, res) => {
+  const benevoleId = req.params.id; // Récupération de l'ID du bénévole depuis les paramètres de l'URL
+  const { nom, prenom, droit, login, mdp, stand } = req.body; // J'ajoute la récupération de la variable stand
+  connection.query('UPDATE benevole SET nom = ?, prenom = ?, id_droits = ?, login = ?, password = ? WHERE id = ?', [nom, prenom, droit, login, mdp, benevoleId], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de la modification du bénévole :', error);
+      res.status(500).send('Erreur lors de la modification du bénévole.');
+      return;
+    }
+    // On suppose que benevoleResultId est défini ailleurs dans votre code
+    connection.query('INSERT INTO lesbenevolesdesstands (id_benevole, id_stand) VALUES (?, ?)', [benevoleId, stand], (err, linkResult) => {
+      if (err) {
+        console.error('Erreur lors de l\'ajout du lien entre le bénévole et le stand :', err);
+        res.status(500).send('Erreur lors de l\'ajout du lien entre le bénévole et le stand.');
+        return;
+      }
+      res.send('<script>alert("Bénévole modifié avec succès !"); window.location.href = "/pageAdmin";</script>');
+
+    });
+  });
+});
+
+
+
+router.get('/choisirProduit', (req, res) => {
+  connection.query('SELECT * FROM produit ORDER BY nom', (error, produits) => {
+    if (error) {
+      console.error('Erreur lors de la récupération des bénévoles :', error);
+      res.status(500).send('Erreur lors de la récupération des bénévoles.');
+      return;
+    }
+    res.render('choisirProduit', { title: 'Choisir le produit à modifier', produits });
+  });
+});
+
+router.get('/modifierProduit', (req, res) => {
+  const produitId = req.query.id; // Utilisation de req.query.id pour récupérer l'ID du produit
+  connection.query('SELECT * FROM produit WHERE id = ?', [produitId], (error, produit) => {
+    if (error) {
+      console.error('Erreur lors de la récupération du produit :', error);
+      res.status(500).send('Erreur lors de la récupération du produit.');
+      return;
+    }
+    console.log(produit); // Assurez-vous que le produit est correctement récupéré
+    res.render('modifierProduit', { title: 'Modifier le produit', produit:produit[0] });
+  });
+});
+
+
+router.post('/modifProduit/:id', (req, res) => {
+  const produitId = req.params.id; // Récupération de l'ID du produit depuis les paramètres de l'URL
+  const { nom, prix } = req.body; // Récupération des données envoyées via le formulaire
+
+  // Mise à jour du produit dans la base de données
+  connection.query(
+      'UPDATE produit SET nom = ?, prix = ? WHERE id = ?',
+      [nom, prix, produitId],
+      (error, results) => {
+        if (error) {
+          console.error('Erreur lors de la mise à jour du produit :', error);
+          res.status(500).send('Erreur lors de la mise à jour du produit.');
+          return;
+        }
+        res.send('<script>alert("Produit modifié avec succès !"); window.location.href = "/pageAdmin";</script>');
+      }
+  );
+});
+router.get('/supprimerProduit', (req, res) => {
+  connection.query('SELECT * FROM produit ORDER BY nom', (error, produits) => {
+    if (error) {
+      console.error('Erreur lors de la récupération des bénévoles :', error);
+      res.status(500).send('Erreur lors de la récupération des bénévoles.');
+      return;
+    }
+    res.render('supprimerProduit', { title: 'Choisir le produit à modifier', produits });
+  });
+});
+
+router.post('/supprProduit', (req, res) => {
+  const produitId = req.body.id; // Récupération de l'ID du produit depuis les paramètres de l'URL
+  console.log(produitId)
+  // Suppression du produit dans la base de données
+  connection.query('DELETE FROM lesproduitsdesstands WHERE id_produit = ?', [produitId], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de la suppression du produit :', error);
+      res.status(500).send('Erreur lors de la suppression du produit.');
+      return;
+    }
+    connection.query('DELETE FROM produit WHERE id = ?', [produitId], (error, results) => {
+      if (error) {
+        console.error('Erreur lors de la suppression du produit :', error);
+        res.status(500).send('Erreur lors de la suppression du produit.');
+        return;
+      }
+      res.send('<script>alert("Produit supprimé avec succès !"); window.location.href = "/pageAdmin";</script>');
+  });
+  });
+});
+
+
+
+router.get('/supprimerBenevole', (req, res) => {
+  connection.query('SELECT * FROM benevole ORDER BY nom', (error, benevoles) => {
+    if (error) {
+      console.error('Erreur lors de la récupération des bénévoles :', error);
+      res.status(500).send('Erreur lors de la récupération des bénévoles.');
+      return;
+    }
+    res.render('supprimerBenevole', { title: 'Choisir le bénévole à modifier', benevoles });
+  });
+});
+
+router.post('/supprBenevole', (req, res) => {
+  const benevoleId = req.body.id; // Récupération de l'ID du produit depuis les paramètres de l'URL
+  // Suppression du produit dans la base de données
+  connection.query('DELETE FROM lesbenevolesdesstands WHERE id_benevole = ?', [benevoleId], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de la suppression du produit :', error);
+      res.status(500).send('Erreur lors de la suppression du produit.');
+      return;
+    }
+    connection.query('DELETE FROM benevole WHERE id = ?', [benevoleId], (error, results) => {
+      if (error) {
+        console.error('Erreur lors de la suppression du produit :', error);
+        res.status(500).send('Erreur lors de la suppression du produit.');
+        return;
+      }
+      res.send('<script>alert("Benevole supprimé avec succès !"); window.location.href = "/pageAdmin";</script>');
+    });
+  });
+});
+
+router.get('/supprimerStand', (req, res) => {
+  // Exécuter une requête SQL pour récupérer tous les stands
+  connection.query('SELECT * FROM stand ORDER BY id', (error, stands) => {
+    if (error) {
+      console.error('Erreur lors de la récupération des stands :', error);
+      return res.status(500).send('Erreur lors de la récupération des stands.');
+    }
+
+    // Rendre la page "choixStandAdmin" avec les données récupérées
+    res.render('supprimerSTand', { title: 'Projet CashLess', stands});
+  });
+});
+
+router.post('/supprStand', (req, res) => {
+  console.log(req.body); // Vérifiez le contenu de req.body pour vous assurer que vous récupérez les données correctement
+  const standId = req.body.id; // Utilisez le bon nom de l'élément select
+  console.log(standId);
+  // Suppression du stand dans la base de données
+  connection.query('DELETE FROM lesbenevolesdesstands WHERE id_stand = ?', [standId], (error, results) => {
+    if (error) {
+      console.error('Erreur lors de la suppression du stand :', error);
+      res.status(500).send('Erreur lors de la suppression du stand.3');
+      return;
+    }
+    connection.query('DELETE FROM lesproduitsdesstands WHERE id_stand = ?', [standId], (error, results) => {
+      if (error) {
+        console.error('Erreur lors de la suppression du stand :', error);
+        res.status(500).send('Erreur lors de la suppression du stand.3');
+        return;
+      }
+    connection.query('DELETE FROM stand WHERE id = ?', [standId], (error, results) => {
+      if (error) {
+        console.error('Erreur lors de la suppression du stand 2 :', error);
+        res.status(500).send('Erreur lors de la suppression du stand. 4');
+        return;
+      }
+    });
+    });res.send('<script>alert("Stand supprimé avec succès !"); window.location.href = "/pageAdmin";</script>');
+  });
+});
+
+router.post('/commandeBenevole/:standId', (req, res, next) => {
+  const standId = req.params.standId; // Récupération de l'ID du stand depuis les paramètres d'URL
+  const produits = req.body; // Récupération des données de la commande depuis le formulaire
+
+  // Parcours des produits dans la commande
+  Object.keys(produits).forEach(produitKey => {
+    // Vérifier si la clé commence par "quantite_" pour s'assurer qu'il s'agit des quantités demandées
+    if (produitKey.startsWith('quantite_')) {
+      const produitId = produitKey.split('_')[1]; // Récupération de l'ID du produit à partir de la clé
+      const quantiteDemandee = produits[produitKey]; // Récupération de la quantité demandée pour ce produit
+
+      // Mettre à jour le stock du stand pour ce produit
+      connection.query('UPDATE lesproduitsdesstands SET stock = stock - ? WHERE id_produit = ? AND id_stand = ?', [quantiteDemandee, produits[produitKey], standId], (error, results) => {
+        if (error) {
+          console.error('Erreur lors de la mise à jour du stock du produit dans le stand :', error);
+          res.status(500).send('Erreur lors de la mise à jour du stock du produit dans le stand.');
+          return;
+        }
+      });
+    }
+  });
+
+  res.send('<script>alert("Commande passée avec succès !"); window.location.href = "/choixvente?stand=' + standId + '";</script>');
+});
 
 
 
