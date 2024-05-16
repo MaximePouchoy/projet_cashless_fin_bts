@@ -359,7 +359,6 @@ router.post('/creerStand', (req, res) => {
 });
 
 
-
 router.get('/choixStandAdmin', (req, res) => {
   // Exécuter une requête SQL pour récupérer tous les stands
   connection.query('SELECT * FROM stand ORDER BY id', (error, results) => {

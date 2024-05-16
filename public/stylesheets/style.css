@@ -16,6 +16,53 @@ body {
   align-items: center;
   display: flex;
 }
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: black;
+  color: white;
+  padding: 15px;
+}
+
+.menu {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: none; /* Par défaut, le menu est caché */
+  position: fixed; /* Le menu reste fixe lors du défilement */
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh; /* Hauteur de 100% de la vue */
+  background-color: #333; /* Couleur de fond du menu */
+  padding-top: 50px; /* Espace pour le logo */
+}
+
+.menu-item {
+  padding: 10px;
+}
+
+.menu-item a {
+  color: white;
+  text-decoration: none;
+}
+
+.menu-item a:hover {
+  text-decoration: underline;
+}
+
+.logo {
+  display: none; /* Par défaut, le logo est caché */
+}
+
+.navigation:hover .menu {
+  display: block; /* Afficher le menu lorsqu'on survole la barre de navigation */
+}
+
+.navigation:hover .logo {
+  display: block; /* Afficher le logo lorsqu'on survole la barre de navigation */
+}
 
 
 
@@ -170,19 +217,18 @@ body {
 
 .submit-button {
   background-color: transparent;
-  color: black;
   border: 2px solid black;
   border-radius: 10px;
   padding: 10px 20px;
   cursor: pointer;
   transition: all 0.3s ease;
   width: 204px;
-  background-image: url('../images/dark_check.png');
 }
 .submit-button:hover {
-  background-color: black;
-  color: white;
+  background-color: #252525;
+  color: yellow; /* Changement de couleur au survol */
 }
+
 
 .stand:hover {
   background-color: black; /* Couleur de fond inversée */
@@ -435,4 +481,80 @@ input[type="password"]:enabled {
 }
 
 
+.image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+}
 
+.image-item {
+  text-align: center;
+  margin: 0 10px;
+  transition: transform 0.3s; /* Animation de transition */
+}
+
+.image-item:hover {
+  transform: scale(1.05); /* Zoom au survol */
+}
+
+.image-item a {
+  display: block;
+  text-align: center;
+}
+
+.image-item img {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.attributs {
+  font-size: 28px;
+  color: black;
+  margin-top: 10px;
+}
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: black;
+  color: white;
+  padding: 15px;
+}
+
+.menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #333;
+  padding: 10px;
+}
+
+.menu ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.menu ul li {
+  margin-bottom: 10px;
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+}
+
+.menu a:hover {
+  text-decoration: underline;
+}
+.menu {
+  display: none;
+}
+
+.menu.show {
+  display: block;
+}

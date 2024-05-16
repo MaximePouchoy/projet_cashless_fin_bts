@@ -1,75 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Page ADMIN</title>
+</head>
+
+<body>
 <% include header.ejs%>
-<html>
 <div class="title-container">
     <div class="main-title">Page ADMIN</div>
     <div class="subtitle">Que voulez-vous faire ?</div>
 </div>
 
-<div class="image-container" >
-    <a href="ajouterBenevole">
-        <img src="/images/ajouterBenevoleDef.png" alt="Image 1">
-    </a>
-    <a href="choixStandAdmin">
-        <img src="/images/ajouterStockDef.png" alt="Image 2">
-    </a>
-</div>
-<p class="attributs">Ajouter Benevole<span class="testespace"></span>Ajouter Stock</p>
-
-<div class="image-container" >
-    <a href="ajouterStand">
-        <img src="/images/ajouterStandDef.png" alt="Image 1">
-    </a>
-    <a href="ajouterProduit">
-        <img src="/images/ajouterProduitDef.png" alt="Image 2">
-    </a>
+<div class="image-container">
+    <div class="image-item">
+        <a href="ajouterBenevole">
+            <img src="/images/ajouterBenevoleDef.png" alt="Image 1">
+        </a>
+        <p class="attributs">Ajouter Benevole</p>
+    </div>
+    <div class="image-item">
+        <a href="choixStandAdmin">
+            <img src="/images/ajouterStockDef.png" alt="Image 2">
+        </a>
+        <p class="attributs">Ajouter Stock</p>
+    </div>
+    <!-- Ajoutez les autres div.image-item similaires ici -->
 </div>
 
-<p class="attributs">Ajouter Stand<span class="testespace"></span>Ajouter Produit</p>
-<br><br><br><br>
-
-<div class="image-container" >
-    <a href="choisirBenevole">
-        <img src="/images/ajouterStandDef.png" alt="Image 1">
-    </a>
-    <a href="choisirProduit">
-        <img src="/images/ajouterProduitDef.png" alt="Image 2">
-    </a>
+<div class="image-container">
+    <div class="image-item">
+        <a href="ajouterStand">
+            <img src="/images/ajouterStandDef.png" alt="Image 3">
+        </a>
+        <p class="attributs">Ajouter Stand</p>
+    </div>
+    <div class="image-item">
+        <a href="ajouterProduit">
+            <img src="/images/ajouterProduitDef.png" alt="Image 4">
+        </a>
+        <p class="attributs">Ajouter Produit</p>
+    </div>
+    <!-- Ajoutez les autres div.image-item similaires ici -->
 </div>
 
-<p class="attributs">Modifier Benevole<span class="testespace"></span>Modifier Produit</p>
-<br><br><br><br>
-
-<div class="image-container" >
-    <a href="supprimerBenevole">
-        <img src="/images/ajouterStandDef.png" alt="Image 1">
-    </a>
-    <a href="supprimerProduit">
-        <img src="/images/ajouterProduitDef.png" alt="Image 2">
-    </a>
+<div class="image-container">
+    <div class="image-item">
+        <a href="choisirBenevole">
+            <img src="/images/modifierVolontaireDef.png" alt="Image 5">
+        </a>
+        <p class="attributs">Modifier Benevole</p>
+    </div>
+    <div class="image-item">
+        <a href="choisirProduit">
+            <img src="/images/modifierProduitDef.png" alt="Image 6">
+        </a>
+        <p class="attributs">Modifier Produit</p>
+    </div>
+    <!-- Ajoutez les autres div.image-item similaires ici -->
 </div>
 
-<p class="attributs">Supprimer Benevole<span class="testespace"></span>Supprimer Produit</p>
-<br><br><br><br>
-
-<div class="image-container" >
-    <a href="supprimerStand">
-        <img src="/images/ajouterStandDef.png" alt="Image 1">
-    </a>
-    <a href="/">
-        <img src="/images/ajouterProduitDef.png" alt="Image 2">
-    </a>
+<div class="image-container">
+    <div class="image-item">
+        <a href="supprimerBenevole">
+            <img src="/images/supprimerVolontaireDef.png" alt="Image 7">
+        </a>
+        <p class="attributs">Supprimer Benevole</p>
+    </div>
+    <div class="image-item">
+        <a href="supprimerProduit">
+            <img src="/images/supprimerProduitDef.png" alt="Image 8">
+        </a>
+        <p class="attributs">Supprimer Produit</p>
+    </div>
+    <!-- Ajoutez les autres div.image-item similaires ici -->
 </div>
 
-<p class="attributs">Supprimer Stand<span class="testespace"></span>Statistiques</p>
-<br><br>
+<div class="image-container">
+    <div class="image-item">
+        <a href="supprimerStand">
+            <img src="/images/supprimerStandDef.png" alt="Image 9">
+        </a>
+        <p class="attributs">Supprimer Stand</p>
+    </div>
+    <div class="image-item">
+        <a href="/">
+            <img src="/images/statistiqueDef.png" alt="Image 10">
+        </a>
+        <p class="attributs">Statistiques</p>
+    </div>
+    <!-- Ajoutez les autres div.image-item similaires ici -->
+</div>
+
 <div class="retour-boutton">
     <a href="/"><button class="submit-button">Retour a la page Admin</button></a>
 </div>
 <br><br>
 </body>
-<script>
-
-
-</script>
 
 </html>
