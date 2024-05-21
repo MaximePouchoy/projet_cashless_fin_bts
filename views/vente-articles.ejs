@@ -1,60 +1,65 @@
 <% include header.ejs %>
 
 <div class="title-container">
-    <div class="main-title"><%= title %></div>
+    <div class="main-title">Modification du stock du stand :</div>
 </div>
+<br>
+<br>
+<form action="/venteArt/<%= idStand %>" method="POST" class="form-container" id="standForm">
 
-<br>
-<br>
-<br>
-<form action="/commandeBenevole/<%=standId%>" method="POST" class="form-container" id="standForm">
-    <div class="product-container">
-        <% produits.forEach(produit => { %>
-            <div>
-                <label class="product_title" for="stock_<%= produit.id %>"><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %></label>
-                <input type="number" name="idproduit_<%= produit.id %>" placeholder="Nombre de produits demandés" min="0" hidden value="<%=produit.id%>">
+
+    <div class="stand-title">Stand : <%=nomStand%></div>
+    <br>
+    <br>
+    <label for="produitDuStand" class="subtitle_stand">Produits du stand :</label>
+
+    <%
+    // Trier les produits en fonction de leur stock
+    const produitsAvecStock = produits.filter(produit => produitsStand.find(standProduit => standProduit.id_produit === produit.id));
+    const produitsSansStock = produits.filter(produit => !produitsStand.find(standProduit => standProduit.id_produit === produit.id));
+
+    produitsAvecStock.forEach(produit => { %>
+        <br>
+        <div class="product-container">
+            <input type="hidden" name="produits" value="<%= produit.id %>">
+            <label for="stock_<%= produit.id %>"><%=produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1)%>
+                <br><br>
+                <input type="number" name="stock_<%= produit.id %>"
+                       placeholder="Stock initial" min="0">
                 <br>
-                <label for="stock_<%= produit.id %>">Stock du Produit : <%= produit.stock %></label>
-                <br>
-                <label for="prix_<%= produit.id %>">Prix du Produit : <%= produit.prix %> €</label>
-                <br>
-                <label for="quantite_<%= produit.id %>">Combien de produits sont demandés ? :</label>
-                <br>
-                <input type="number" name="quantite_<%= produit.id %>" placeholder="Nombre de produits demandés" min="0">
-                <p>____________________________</p>
+                <label>Stock actuel : <%= produitsStand.find(standProduit => standProduit.id_produit === produit.id).stock %></label></label>
+            <p>________________________</p>
+        </div>
+    <% }); %>
+    <br>
+    <br>
+    <div hidden>
+        <label for="produitDuStand" class="subtitle_stand">Produits non disponibles :</label>
+        <% produitsSansStock.forEach(produit => { %>
+            <div class="product-container">
+                <input type="hidden" name="produits" value="<%= produit.id %>">
+                <label for="stock_<%= produit.id %>"><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %></label>
+                <input type="number" name="stock_<%= produit.id %>"
+                       placeholder="Stock initial" min="0"><br>
+                <label> Stock actuel : Pas disponible</label>
             </div>
         <% }); %>
     </div>
-    <button type="submit">Ajouter Produit</button>
+    <button type="submit">Modifier Stock</button>
 </form>
 
-<br>
-<br>
-<br>
-<div class="retour-boutton">
-    <a href="/vente"><button class="submit-button">Retour aux stands</button></a>
-</div>
-
-
-
-
 <script>
-    // Fonction pour incrémenter la quantité
-    function incrementQuantity(productId) {
-        var quantityElement = document.getElementById('quantity_' + productId);
-        var currentQuantity = parseInt(quantityElement.innerText);
-        quantityElement.innerText = currentQuantity + 1;
-    }
-
-    // Fonction pour décrémenter la quantité
-    function decrementQuantity(productId) {
-        var quantityElement = document.getElementById('quantity_' + productId);
-        var currentQuantity = parseInt(quantityElement.innerText);
-        if (currentQuantity > 0) {
-            quantityElement.innerText = currentQuantity - 1;
-        }
-    }
+    // Intercepter la soumission du formulaire pour remplir automatiquement les champs non cochés avec 0
+    document.getElementById('standForm').addEventListener('submit', function(event) {
+        // Récupérer toutes les cases cochées
+        const checkedCheckboxes = document.querySelectorAll('input[name="produits_checkbox"]:checked');
+        // Pour chaque case cochée, activer le champ de stock associé
+        checkedCheckboxes.forEach(checkbox => {
+            const stockInput = document.querySelector(`input[name="stock_${checkbox.value}"]`);
+            stockInput.disabled = false;
+        });
+    });
 </script>
 
-</body>
 </html>
+
