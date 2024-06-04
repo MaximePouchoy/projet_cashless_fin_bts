@@ -1,16 +1,20 @@
 <% include header.ejs %>
 
 <div class="title-container">
-    <div class="main-title">Modification du stock du stand :</div>
+    <div class="main-title">Passer une commande :</div>
 </div>
 <br>
 <br>
 <form action="/venteArt/<%= idStand %>" method="POST" class="form-container" id="standForm">
-
-
     <div class="stand-title">Stand : <%=nomStand%></div>
     <br>
     <br>
+    <!-- Nouveau champ pour le numéro de carte -->
+    <br>
+    <label for="cardNumber" class="subtitle_stand">Numéro de carte :</label>
+    <input type="text" id="cardNumber" name="cardNumber" placeholder="Entrez le numéro de carte" required>
+    <br>
+
     <label for="produitDuStand" class="subtitle_stand">Produits du stand :</label>
 
     <%
@@ -18,18 +22,22 @@
     const produitsAvecStock = produits.filter(produit => produitsStand.find(standProduit => standProduit.id_produit === produit.id));
     const produitsSansStock = produits.filter(produit => !produitsStand.find(standProduit => standProduit.id_produit === produit.id));
 
-    produitsAvecStock.forEach(produit => { %>
-        <br>
-        <div class="product-container">
-            <input type="hidden" name="produits" value="<%= produit.id %>">
-            <label for="stock_<%= produit.id %>"><%=produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1)%>
-                <br><br>
-                <input type="number" name="stock_<%= produit.id %>"
-                       placeholder="Stock initial" min="0">
-                <br>
-                <label>Stock actuel : <%= produitsStand.find(standProduit => standProduit.id_produit === produit.id).stock %></label></label>
-            <p>________________________</p>
-        </div>
+    produitsAvecStock.forEach(produit => {
+        const produitStand = produitsStand.find(standProduit => standProduit.id_produit === produit.id);
+    %>
+    <br>
+    <div class="product-container">
+        <input type="hidden" name="produits" value="<%= produit.id %>">
+        <label for="stock_<%= produit.id %>">
+            <%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %>
+            (Prix: <%= produit.prix %> €)
+            <br><br>
+            <input type="number" name="stock_<%= produit.id %>" placeholder="Stock initial" min="0">
+            <br>
+            <label>Stock actuel : <%= produitStand.stock %></label>
+        </label>
+        <p>________________________</p>
+    </div>
     <% }); %>
     <br>
     <br>
@@ -38,28 +46,59 @@
         <% produitsSansStock.forEach(produit => { %>
             <div class="product-container">
                 <input type="hidden" name="produits" value="<%= produit.id %>">
-                <label for="stock_<%= produit.id %>"><%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %></label>
-                <input type="number" name="stock_<%= produit.id %>"
-                       placeholder="Stock initial" min="0"><br>
-                <label> Stock actuel : Pas disponible</label>
+                <label for="stock_<%= produit.id %>">
+                    <%= produit.nom.charAt(0).toUpperCase() + produit.nom.slice(1) %>
+                    (Prix: <%= produit.prix %> €)
+                </label>
+                <input type="number" name="stock_<%= produit.id %>" placeholder="Stock initial" min="0">
+                <br>
+                <label>Stock actuel : Pas disponible</label>
             </div>
         <% }); %>
     </div>
-    <button type="submit">Modifier Stock</button>
+
+    <button type="submit">Passer commande</button>
 </form>
 
 <script>
-    // Intercepter la soumission du formulaire pour remplir automatiquement les champs non cochés avec 0
+    // Intercepter la soumission du formulaire pour valider les champs
     document.getElementById('standForm').addEventListener('submit', function(event) {
-        // Récupérer toutes les cases cochées
-        const checkedCheckboxes = document.querySelectorAll('input[name="produits_checkbox"]:checked');
-        // Pour chaque case cochée, activer le champ de stock associé
-        checkedCheckboxes.forEach(checkbox => {
-            const stockInput = document.querySelector(`input[name="stock_${checkbox.value}"]`);
-            stockInput.disabled = false;
+        let isValid = true;
+
+        // Valider le numéro de carte
+        const cardNumberInput = document.getElementById('cardNumber');
+        if (cardNumberInput.value.trim() === '') {
+            isValid = false;
+            alert('Le numéro de carte est requis.');
+            cardNumberInput.classList.add('error');
+        } else {
+            cardNumberInput.classList.remove('error');
+        }
+
+        // Valider les stocks
+        const stockInputs = document.querySelectorAll('input[type="number"][name^="stock_"]');
+        stockInputs.forEach(input => {
+            const stockValue = Number(input.value);
+            if (stockValue < 0 || isNaN(stockValue)) {
+                isValid = false;
+                alert('Le stock doit être supérieur ou égal à zéro.');
+                input.classList.add('error');
+            } else {
+                input.classList.remove('error');
+            }
         });
+
+        if (!isValid) {
+            event.preventDefault(); // Empêcher la soumission du formulaire si une validation échoue
+        }
     });
 </script>
 
+<style>
+    .error {
+        border: 2px solid red;
+    }
+</style>
+<br>
+<br>
 </html>
-

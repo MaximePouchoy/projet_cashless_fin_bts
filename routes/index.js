@@ -743,42 +743,109 @@ router.get('/vente-articles', (req, res, next) => {
 router.post('/venteArt/:idStand', (req, res) => {
   const idStand = req.params.idStand; // Récupère l'ID du stand depuis les paramètres de la requête
   const produits = req.body.produits;
+  const cardNumber = req.body.cardNumber; // Récupère le numéro de carte depuis le corps de la requête
 
-  produits.forEach(produitId => {
-    const stock = req.body['stock_' + produitId];
+  // Vérifier si le numéro de carte est présent
+  if (!cardNumber) {
+    return res.send(`<script>alert("Numéro de carte manquant !"); window.history.back();</script>`);
+  }
 
-    // Vérifier si le stock est différent de zéro avant de poursuivre
-    if (stock !== 0 && stock !== "") {
-      // Vérifier si une entrée existe déjà pour ce stand et ce produit
-      connection.query('SELECT * FROM lesproduitsdesstands WHERE id_stand = ? AND id_produit = ?', [idStand, produitId], (err, results) => {
-        if (err) {
-          // Gérer les erreurs de la requête SQL
-          return res.status(500).send('Erreur lors de la vérification de l\'existence de l\'entrée dans la base de données');
-        }
+  // Récupérer le solde actuel de la carte
+  connection.query('SELECT solde FROM carte WHERE tag = ?', [cardNumber], (err, results) => {
+    if (err) {
+      return res.status(500).send('Erreur lors de la récupération du solde de la carte');
+    }
 
-        if (results.length > 0) {
-          // Une entrée existe déjà, effectuer une mise à jour
-          connection.query('UPDATE lesproduitsdesstands SET stock = stock - ? WHERE id_stand = ? AND id_produit = ?', [stock, idStand, produitId], (err, updateResult) => {
+    if (results.length === 0) {
+      return res.send(`<script>alert("Numéro de carte invalide !"); window.history.back();</script>`);
+    }
+
+    const soldeCarte = results[0].solde;
+    let totalCost = 0;
+
+    // Récupérer les prix des produits et calculer le coût total de la commande
+    let queryPromises = produits.map(produitId => {
+      return new Promise((resolve, reject) => {
+        const stock = req.body['stock_' + produitId];
+
+        // Vérifier si le stock est différent de zéro avant de poursuivre
+        if (stock !== 0 && stock !== "") {
+          connection.query('SELECT prix FROM produit WHERE id = ?', [produitId], (err, result) => {
             if (err) {
-              // Gérer les erreurs de la requête SQL
-              return res.status(500).send('Erreur lors de la mise à jour de l\'entrée dans la base de données');
+              reject(err);
+            } else {
+              const price = result[0].prix;
+              totalCost += price * stock;
+              resolve();
             }
           });
         } else {
-          // Aucune entrée existante, effectuer une insertion
-          connection.query('INSERT INTO lesproduitsdesstands (id_stand, id_produit, stock) VALUES (?, ?, ?)', [idStand, produitId, stock], (err, insertResult) => {
-            if (err) {
-              // Gérer les erreurs de la requête SQL
-              return res.status(500).send('Erreur lors de l\'insertion de l\'entrée dans la base de données');
-            }
-          });
+          resolve();
         }
       });
-    }
+    });
+
+    // Attendre que toutes les requêtes de prix soient terminées
+    Promise.all(queryPromises).then(() => {
+      // Vérifier si le solde de la carte est suffisant pour couvrir le coût total
+      if (totalCost > soldeCarte) {
+        return res.send(`<script>alert("Solde insuffisant ! Solde actuel: ${soldeCarte}"); window.history.back();</script>`);
+      }
+
+      // Mettre à jour le solde de la carte
+      const newSolde = soldeCarte - totalCost;
+      connection.query('UPDATE carte SET solde = ? WHERE tag = ?', [newSolde, cardNumber], (err) => {
+        if (err) {
+          return res.status(500).send('Erreur lors de la mise à jour du solde de la carte');
+        }
+
+        // Mettre à jour le stock des produits
+        let stockUpdatePromises = produits.map(produitId => {
+          return new Promise((resolve, reject) => {
+            const stock = req.body['stock_' + produitId];
+
+            // Vérifier si le stock est différent de zéro avant de poursuivre
+            if (stock !== 0 && stock !== "") {
+              connection.query('SELECT * FROM lesproduitsdesstands WHERE id_stand = ? AND id_produit = ?', [idStand, produitId], (err, results) => {
+                if (err) {
+                  reject(err);
+                } else if (results.length > 0) {
+                  // Une entrée existe déjà, effectuer une mise à jour
+                  connection.query('UPDATE lesproduitsdesstands SET stock = stock - ? WHERE id_stand = ? AND id_produit = ?', [stock, idStand, produitId], (err) => {
+                    if (err) {
+                      reject(err);
+                    } else {
+                      resolve();
+                    }
+                  });
+                } else {
+                  // Aucune entrée existante, effectuer une insertion
+                  connection.query('INSERT INTO lesproduitsdesstands (id_stand, id_produit, stock) VALUES (?, ?, ?)', [idStand, produitId, stock], (err) => {
+                    if (err) {
+                      reject(err);
+                    } else {
+                      resolve();
+                    }
+                  });
+                }
+              });
+            } else {
+              resolve();
+            }
+          });
+        });
+
+        // Attendre que toutes les mises à jour du stock soient terminées
+        Promise.all(stockUpdatePromises).then(() => {
+          res.send(`<script>alert("Stock modifié avec succès ! Nouveau solde: ${newSolde}"); window.location.href = '/choixvente?stand=${idStand}';</script>`);
+        }).catch(err => {
+          res.status(500).send('Erreur lors de la mise à jour du stock des produits');
+        });
+      });
+    }).catch(err => {
+      res.status(500).send('Erreur lors de la récupération des prix des produits');
+    });
   });
-
-  res.send(`<script>alert("Stock modifié avec succès !"); window.location.href = '/choixvente?stand=${idStand}';</script>`);
-
 });
 
 module.exports = router;
